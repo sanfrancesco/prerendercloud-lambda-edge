@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "aws-sdk": "^2.94.0",
+    "jasmine": "^2.7.0",
+    "nock": "^9.0.14",
+    "serverless": "^1.19.0"
+  },
+  "dependencies": {
+    "prerendercloud": "^1.16.7"
+  }
+}
