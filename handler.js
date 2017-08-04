@@ -5,7 +5,17 @@
 
 const prerendercloud = require("prerendercloud");
 // if it takes longer than 2.8s, just bail out so we don't return an error
+// since Lambda@Edge max duration is 3s
 prerendercloud.set("timeout", 2800);
+
+// alternatively set PRERENDER_TOKEN env var in serverless.yml
+// prerendercloud.set('prerenderToken', 'mySecretToken')
+
+// not recommended due to potential cloaking penalties
+// prerendercloud.set('botsOnly', true);
+
+// disable this if you're trying to be under the 256KB limit
+// prerendercloud.set('disableAjaxPreload', true);
 
 const getHeader = (cloudFrontRequest, name) =>
   cloudFrontRequest.headers[name] &&

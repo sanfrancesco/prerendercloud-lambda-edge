@@ -16,14 +16,13 @@ Read more:
 $ yarn
 ```
 
-## Usage
+## Usage/Configuration
 
-Set the following environment variables: CLOUDFRONT_DISTRIBUTION_ID
+Edit [handler.js](/handler.js), see configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+
+### Deployment
+Set the following environment variables when deploying: CLOUDFRONT_DISTRIBUTION_ID
 
 ```
 $ make deploy
 ```
-
-## Configure
-
-Edit handler.js, see configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
