@@ -17,6 +17,9 @@ prerendercloud.set("timeout", 2800);
 // disable this if you're trying to be under the 256KB limit
 // prerendercloud.set('disableAjaxPreload', true);
 
+// remove all script tags (enabling this would also remove Ajax Prelaod)
+// prerendercloud.set('removeScriptTags', true);
+
 const getHeader = (cloudFrontRequest, name) =>
   cloudFrontRequest.headers[name] &&
   cloudFrontRequest.headers[name][0] &&
