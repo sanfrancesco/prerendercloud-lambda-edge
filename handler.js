@@ -4,20 +4,22 @@
 "use strict";
 
 const prerendercloud = require("prerendercloud");
+
+// you must hardcode your token here (or use something like dotenv)
+// because Lambda@Edge doesn't support env vars
+// prerendercloud.set('prerenderToken', 'mySecretToken')
+
 // if it takes longer than 2.8s, just bail out so we don't return an error
 // since Lambda@Edge max duration is 3s
 prerendercloud.set("timeout", 2800);
 
-// alternatively set PRERENDER_TOKEN env var in serverless.yml
-// prerendercloud.set('prerenderToken', 'mySecretToken')
-
 // not recommended due to potential cloaking penalties
+// but may be necessary if you have script errors
+// from the server-side rendered content
 // prerendercloud.set('botsOnly', true);
 
-// disable this if you're trying to be under the 256KB limit
-// prerendercloud.set('disableAjaxPreload', true);
-
-// remove all script tags (enabling this would also remove Ajax Prelaod)
+// uncomment this if you're trying to be under the 256KB limit
+// and you're OK with there being no JS in the prerendered app
 // prerendercloud.set('removeScriptTags', true);
 
 const getHeader = (cloudFrontRequest, name) =>
@@ -102,6 +104,11 @@ module.exports.viewerRequest = (event, context, callback) => {
 };
 
 module.exports.originRequest = (event, context, callback) => {
+  // temporary until timeout function of prerendercloud or got is fixed
+  // so it cancels request when timeout is reached
+  // https://github.com/sindresorhus/got/issues/344
+  context.callbackWaitsForEmptyEventLoop = false;
+
   const cloudFrontRequest = event.Records[0].cf.request;
 
   const req = createRequest(cloudFrontRequest);

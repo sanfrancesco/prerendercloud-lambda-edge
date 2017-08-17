@@ -18,10 +18,17 @@ $ yarn
 
 ## Usage/Configuration
 
-Edit [handler.js](/handler.js), see configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+Edit [handler.js](/handler.js)
+
+1. set your prerender.cloud API token (cmd+f for `prerenderToken`)
+2. see additional configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
 ### Deployment
-Set the following environment variables when deploying: CLOUDFRONT_DISTRIBUTION_ID
+1. Use an AWS user with any of the following permissions:
+  * see refined list from here https://github.com/serverless/serverless/issues/1439
+  * root access
+  * [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess] (this is almost root)
+2. Set the following environment variables when deploying: CLOUDFRONT_DISTRIBUTION_ID
 
 ```
 $ make deploy
