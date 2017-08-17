@@ -16,7 +16,7 @@ prerendercloud.set("timeout", 2800);
 // not recommended due to potential cloaking penalties
 // but may be necessary if you have script errors
 // from the server-side rendered content
-// prerendercloud.set('botsOnly', true);
+// prerendercloud.set("botsOnly", true);
 
 // uncomment this if you're trying to be under the 256KB limit
 // and you're OK with there being no JS in the prerendered app
@@ -54,7 +54,15 @@ const createRequest = cloudFrontRequest => {
 // response interface adapter, from Node/Connect/express -> cloudFront
 // so it works with prerendercloud middleware
 const createResponse = callback => {
-  return {
+  const res = {
+    // the vary package in prerendercloud needs getHeader and setHeader
+    getHeader(key) {
+      return this.headers[key];
+    },
+    setHeader(key, val) {
+      console.log("setHeader", key, val);
+      this.headers[key] = val;
+    },
     end(body) {
       return callback(null, {
         status: this.status,
@@ -64,19 +72,24 @@ const createResponse = callback => {
       });
     },
     writeHead(_status, _headers) {
+      const mergedHeaders = Object.assign({}, _headers, this.headers);
+
       this.status = `${_status}`;
-      this.headers = Object.keys(_headers).reduce((memo, headerKey) => {
+      this.headers = Object.keys(mergedHeaders).reduce((memo, headerKey) => {
         return Object.assign(memo, {
           [headerKey.toLowerCase()]: [
             {
               key: headerKey,
-              value: _headers[headerKey]
+              value: mergedHeaders[headerKey]
             }
           ]
         });
       }, {});
     }
   };
+
+  res.headers = {};
+  return res;
 };
 
 const createNext = (cloudFrontRequest, callback, originalUrl) => {
