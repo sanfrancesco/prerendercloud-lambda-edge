@@ -4,7 +4,7 @@
 "use strict";
 
 const prerendercloud = require("prerendercloud");
-
+const url = require("url");
 // you must hardcode your token here (or use something like dotenv)
 // because Lambda@Edge doesn't support env vars
 // prerendercloud.set('prerenderToken', 'mySecretToken')
@@ -21,6 +21,23 @@ prerendercloud.set("timeout", 2800);
 // uncomment this if you're trying to be under the 256KB limit
 // and you're OK with there being no JS in the prerendered app
 // prerendercloud.set('removeScriptTags', true);
+
+const isHtml = urlStr => {
+  const parsedUrl = url.parse(urlStr);
+  const path = parsedUrl.pathname;
+  const basename = path.split("/").pop();
+  // doesn't detect index.whatever.html (multiple dots)
+  const hasHtmlOrNoExtension = !!basename.match(/^(([^.]|\.html?)+)$/);
+
+  if (hasHtmlOrNoExtension) return true;
+
+  // hack to handle basenames with multiple dots: index.whatever.html
+  const endsInHtml = !!basename.match(/.html?$/);
+
+  if (endsInHtml) return true;
+
+  return false;
+};
 
 const getHeader = (cloudFrontRequest, name) =>
   cloudFrontRequest.headers[name] &&
@@ -60,7 +77,6 @@ const createResponse = callback => {
       return this.headers[key];
     },
     setHeader(key, val) {
-      console.log("setHeader", key, val);
       this.headers[key] = val;
     },
     end(body) {
@@ -94,8 +110,21 @@ const createResponse = callback => {
 
 const createNext = (cloudFrontRequest, callback, originalUrl) => {
   cloudFrontRequest.uri = originalUrl;
-  const next = () => callback(null, cloudFrontRequest);
-  return next;
+  // this is called when prerendercloud middleware
+  // skips because non-prerenderable extension or user-agent
+  // so we can also use it as a faux 404 -> index.html
+  // because we'll just assume anything extensionless or *.html
+  // should be converted to index.html
+  return () => {
+    if (isHtml(originalUrl)) {
+      console.log("rewriting", cloudFrontRequest.uri, "to index.html");
+      cloudFrontRequest.uri = "/index.html";
+      return callback(null, cloudFrontRequest);
+    } else {
+      console.log("not rewriting", cloudFrontRequest.uri);
+      callback(null, cloudFrontRequest);
+    }
+  };
 };
 
 const toBase64 = str => Buffer.from(str).toString("base64");
@@ -103,6 +132,8 @@ const fromBase64 = str => Buffer.from(str, "base64").toString("utf8");
 
 module.exports.viewerRequest = (event, context, callback) => {
   const request = event.Records[0].cf.request;
+
+  const b4 = request.uri;
 
   const json = JSON.stringify({
     uri: request.uri,
@@ -112,6 +143,12 @@ module.exports.viewerRequest = (event, context, callback) => {
 
   // uri must start with /
   request.uri = `/${toBase64(json)}`;
+
+  const after = request.uri;
+
+  const afterDecoded = fromBase64(after.slice(1));
+
+  console.log({ b4, after, afterDecoded });
 
   callback(null, request);
 };
@@ -125,6 +162,8 @@ module.exports.originRequest = (event, context, callback) => {
   const cloudFrontRequest = event.Records[0].cf.request;
 
   const req = createRequest(cloudFrontRequest);
+
+  console.log({ uri: req.originalUrl, userAgent: req.headers["user-agent"] });
 
   const next = createNext(cloudFrontRequest, callback, req.originalUrl);
 
