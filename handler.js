@@ -26,6 +26,9 @@ const isHtml = urlStr => {
   const parsedUrl = url.parse(urlStr);
   const path = parsedUrl.pathname;
   const basename = path.split("/").pop();
+
+  if (basename === '') return true;
+
   // doesn't detect index.whatever.html (multiple dots)
   const hasHtmlOrNoExtension = !!basename.match(/^(([^.]|\.html?)+)$/);
 
