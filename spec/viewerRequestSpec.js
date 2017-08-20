@@ -36,7 +36,9 @@ describe("viewerRequest", function() {
         headers: {
           host: [{ value: "d123.cf.net", key: "Host" }],
           "user-agent": [{ value: userAgent, key: "User-Agent" }],
-          [util.USER_AGENT_PLACEHOLDER]: [{ value: userAgent, key: util.USER_AGENT_PLACEHOLDER }]
+          [util.USER_AGENT_PLACEHOLDER]: [
+            { value: userAgent, key: util.USER_AGENT_PLACEHOLDER }
+          ]
         },
         clientIp: "2001:cdba::3257:9652",
         uri: createUriShouldPrerender(uri),
@@ -121,11 +123,36 @@ describe("viewerRequest", function() {
       });
     });
 
+    // since shouldPrerender is false, it rewrites uri to /index.html for cache-key
     describe("prerendercloud user-agent", function() {
-      withUserAgentAndUri("prerendercloud random-suffix", "/index.html");
-      runHandlerWithViewerRequestEvent();
+      describe("html files", function() {
+        describe("html extension", function() {
+          withUserAgentAndUri("prerendercloud random-suffix", "/index.html");
+          runHandlerWithViewerRequestEvent();
 
-      itDoesNotPrerender("prerendercloud random-suffix", "/index.html");
+          itDoesNotPrerender("prerendercloud random-suffix", "/index.html");
+        });
+        describe("no extension or trailing slash", function() {
+          withUserAgentAndUri("prerendercloud random-suffix", "/index");
+          runHandlerWithViewerRequestEvent();
+
+          itDoesNotPrerender("prerendercloud random-suffix", "/index.html");
+        });
+        describe("trailing slash", function() {
+          withUserAgentAndUri("prerendercloud random-suffix", "/index/");
+          runHandlerWithViewerRequestEvent();
+
+          itDoesNotPrerender("prerendercloud random-suffix", "/index.html");
+        });
+      });
+
+      // even though shouldPrerender is false, the uri is not HTML so it preserves uri for cache-key
+      describe("non html files", function() {
+        withUserAgentAndUri("prerendercloud random-suffix", "/app.js");
+        runHandlerWithViewerRequestEvent();
+
+        itDoesNotPrerender("prerendercloud random-suffix", "/app.js");
+      });
     });
   });
 
@@ -134,15 +161,17 @@ describe("viewerRequest", function() {
       prerendercloud.set("botsOnly", true);
     });
 
+    // since shouldPrerender is true, it preserves uri for cache-key
     describe("twitterbot user-agent", function() {
-      withUserAgentAndUri("twitterbot", "/index.html");
+      withUserAgentAndUri("twitterbot", "/nested/path");
       runHandlerWithViewerRequestEvent();
 
-      itPrerenders("twitterbot", "/index.html");
+      itPrerenders("twitterbot", "/nested/path");
     });
 
+    // since shouldPrerender is false, it rewrites uri for cache-key
     describe("curl user-agent", function() {
-      withUserAgentAndUri("curl", "/index.html");
+      withUserAgentAndUri("curl", "/nexted/path");
       runHandlerWithViewerRequestEvent();
 
       itDoesNotPrerender("curl", "/index.html");
