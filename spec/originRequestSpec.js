@@ -1,8 +1,6 @@
 const handler = require("../handler");
 const nock = require("nock");
-
-const helper = require("./helper");
-
+const util = require("../lib/util");
 const prerendercloud = require("prerendercloud");
 
 describe("originRequest", function() {
@@ -53,13 +51,13 @@ describe("originRequest", function() {
     });
   }
 
-  function itReturnsOriginalCloudFrontRequestWithNormalPath(userAgent, uri) {
+  function itReturnsOriginalCloudFrontRequestWithNormalPath(uri) {
     it("returns original CloudFront request with normal path", function() {
       expect(this.cb).toHaveBeenCalledWith(null, {
         headers: {
           host: [{ value: "d123.cf.net", key: "Host" }],
           // "user-agent": [{ value: "test-agent", key: "User-Agent" }]
-          "user-agent": [{ value: userAgent, key: "User-Agent" }]
+          "user-agent": [{ value: "CloudFront", key: "User-Agent" }]
         },
         clientIp: "2001:cdba::3257:9652",
         uri: uri,
@@ -68,160 +66,123 @@ describe("originRequest", function() {
     });
   }
 
-  describe("originRequest", function() {
-    beforeEach(function() {
-      const self = this;
-      this.prerenderServer = nock("https://service.prerender.cloud")
-        .get(/.*/)
-        .reply(function(uri) {
-          self.requestedPrerenderUri = uri;
-          self.headersSentToServer = this.req.headers;
-          // return [200, "prerendered-body", {wut: 'kok'}];
-          return [200, "prerendered-body", { "content-type": "text/html" }];
-        });
-      this.handler = handler.originRequest;
-      this.event = {
-        Records: [
-          {
-            cf: {
-              request: {
-                headers: {
-                  host: [
-                    {
-                      value: "d123.cf.net",
-                      key: "Host"
-                    }
-                  ],
-                  "user-agent": [
-                    {
-                      value: "test-agent",
-                      key: "User-Agent"
-                    }
-                  ]
-                },
-                clientIp: "2001:cdba::3257:9652",
-                uri: helper.createUri("/index.html", "twitterbot"),
-                method: "GET"
-              }
+  beforeEach(function() {
+    const self = this;
+    this.prerenderServer = nock("https://service.prerender.cloud")
+      .get(/.*/)
+      .reply(function(uri) {
+        self.requestedPrerenderUri = uri;
+        self.headersSentToServer = this.req.headers;
+        // return [200, "prerendered-body", {wut: 'kok'}];
+        return [200, "prerendered-body", { "content-type": "text/html" }];
+      });
+    this.handler = handler.originRequest;
+    this.event = {
+      Records: [
+        {
+          cf: {
+            request: {
+              headers: {
+                host: [
+                  {
+                    value: "d123.cf.net",
+                    key: "Host"
+                  }
+                ],
+                "user-agent": [
+                  {
+                    value: "CloudFront",
+                    key: "User-Agent"
+                  }
+                ]
+              },
+              clientIp: "2001:cdba::3257:9652",
+              uri: "",
+              method: "GET"
             }
           }
-        ]
-      };
-      this.context = {};
+        }
+      ]
+    };
+    this.context = {};
+  });
+
+  function withInputs(userAgent, uri, shouldPrerender) {
+    beforeEach(function() {
+      this.event.Records[0].cf.request.uri = util.createUri(
+        uri,
+        shouldPrerender
+      );
+      const headerPlaceholder = (this.event.Records[0].cf.request.headers[
+        "prerendercloud-lambda-edge-original-user-agent"
+      ] = [
+        {
+          value: userAgent,
+          key: "prerendercloud-lambda-edge-original-user-agent"
+        }
+      ]);
     });
+  }
 
-    function withUserAgentAndUri(userAgent, uri) {
-      beforeEach(function() {
-        this.event.Records[0].cf.request.uri = helper.createUri(uri, userAgent);
-        this.event.Records[0].cf.request.headers[
-          "user-agent"
-        ][0].value = userAgent;
-      });
-    }
+  describe("when shouldPrerender is true", function() {
+    withInputs("whatever", "/index.html", true);
+    runHandlerWithOriginRequestEvent();
 
-    describe("when prerendering all user-agents (default)", function() {
-      describe("curl user-agent", function() {
-        withUserAgentAndUri("curl", "/index.html");
+    itForwardsRequestToPrerenderCloud(
+      "whatever",
+      "/http://d123.cf.net/index.html"
+    );
+  });
+
+  describe("when shouldPrerender is false", function() {
+    withInputs("whatever", "/index.html", false);
+    runHandlerWithOriginRequestEvent();
+
+    itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
+  });
+
+  describe("404->index.html-custom error response replacement", function() {
+    describe("when shouldPrerender is true", function() {
+      describe("/nested/path no trailing slash", function() {
+        withInputs("whatever", "/nested/path", true);
         runHandlerWithOriginRequestEvent();
 
+        // it does not rewrite path (it preserves path)
         itForwardsRequestToPrerenderCloud(
-          "curl",
-          "/http://d123.cf.net/index.html"
-        );
-      });
-      describe("prerendercloud user-agent", function() {
-        withUserAgentAndUri("prerendercloud random-suffix", "/index.html");
-        runHandlerWithOriginRequestEvent();
-
-        itReturnsOriginalCloudFrontRequestWithNormalPath(
-          "prerendercloud random-suffix",
-          "/index.html"
+          "whatever",
+          "/http://d123.cf.net/nested/path"
         );
       });
     });
-
-    describe("when prerendering botsOnly user-agents", function() {
-      beforeEach(function() {
-        prerendercloud.set("botsOnly", true);
-      });
-      describe("twitterbot user-agent", function() {
-        withUserAgentAndUri("twitterbot", "/index.html");
+    describe("when shouldPrerender is false", function() {
+      describe("/ root path", function() {
+        withInputs("whatever", "/", false);
         runHandlerWithOriginRequestEvent();
 
-        itForwardsRequestToPrerenderCloud(
-          "twitterbot",
-          "/http://d123.cf.net/index.html",
-          { vary: [{ key: "Vary", value: "User-Agent" }] }
-        );
+        // it rewrites to /index.html
+        itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
       });
-      describe("curl user-agent", function() {
-        withUserAgentAndUri("curl", "/index.html");
+
+      describe("/nested/path no trailing slash", function() {
+        withInputs("whatever", "/nested/path", false);
         runHandlerWithOriginRequestEvent();
 
-        itReturnsOriginalCloudFrontRequestWithNormalPath("curl", "/index.html");
+        // it rewrites to /index.html
+        itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
       });
-      describe("prerendercloud user-agent", function() {
-        withUserAgentAndUri("prerendercloud random-suffix", "/index.html");
+      describe("/nested/path/ with trailing slash", function() {
+        withInputs("whatever", "/nested/path/", false);
         runHandlerWithOriginRequestEvent();
 
-        itReturnsOriginalCloudFrontRequestWithNormalPath(
-          "prerendercloud random-suffix",
-          "/index.html"
-        );
+        // it rewrites to /index.html
+        itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
       });
-    });
+      describe("non HTML", function() {
+        withInputs("whatever", "/app.js", false);
+        runHandlerWithOriginRequestEvent();
 
-    describe("spa 404->index.html (custom error response replacement)", function() {
-      describe("with botsOnly, curl user-agent causes HTML paths to be converted to index.html", function() {
-        beforeEach(function() {
-          prerendercloud.set("botsOnly", true);
-        });
-        describe("when hitting path without trailing slash: /docs", function() {
-          withUserAgentAndUri("prerendercloud", "/docs");
-          runHandlerWithOriginRequestEvent();
-          itReturnsOriginalCloudFrontRequestWithNormalPath(
-            "prerendercloud",
-            "/index.html"
-          );
-        });
-      });
-
-      describe("prerendercloud user-agent causes HTML paths to be converted to index.html", function() {
-        describe("when hitting root path: /", function() {
-          withUserAgentAndUri("prerendercloud", "/");
-          runHandlerWithOriginRequestEvent();
-          itReturnsOriginalCloudFrontRequestWithNormalPath(
-            "prerendercloud",
-            "/index.html"
-          );
-        });
-
-        describe("when hitting path without trailing slash: /docs", function() {
-          withUserAgentAndUri("prerendercloud", "/docs");
-          runHandlerWithOriginRequestEvent();
-          itReturnsOriginalCloudFrontRequestWithNormalPath(
-            "prerendercloud",
-            "/index.html"
-          );
-        });
-
-        describe("when hitting path with trailing slash: /docs/", function() {
-          withUserAgentAndUri("prerendercloud", "/docs/");
-          runHandlerWithOriginRequestEvent();
-          itReturnsOriginalCloudFrontRequestWithNormalPath(
-            "prerendercloud",
-            "/index.html"
-          );
-        });
-
-        describe("when hitting non HTML: /app.js", function() {
-          withUserAgentAndUri("prerendercloud", "/app.js");
-          runHandlerWithOriginRequestEvent();
-          itReturnsOriginalCloudFrontRequestWithNormalPath(
-            "prerendercloud",
-            "/app.js"
-          );
-        });
+        // it does not rewrite path (it preserves path)
+        itReturnsOriginalCloudFrontRequestWithNormalPath("/app.js");
       });
     });
   });
