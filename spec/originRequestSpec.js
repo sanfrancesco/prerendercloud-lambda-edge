@@ -17,24 +17,7 @@ describe("originRequest", function() {
     });
   }
 
-  function itForwardsRequestToPrerenderCloud(
-    userAgent,
-    uri,
-    extraHeaders = {}
-  ) {
-    it("sends exact URL to prerender server with leading slash", function() {
-      expect(this.requestedPrerenderUri).toEqual(uri);
-    });
-
-    it("sends prerendercloud middleware user-agent, and curl x-original-user-agent, and gzip", function() {
-      expect(this.headersSentToServer).toEqual({
-        "user-agent": "prerender-cloud-nodejs-middleware",
-        "accept-encoding": "gzip",
-        "x-original-user-agent": userAgent,
-        host: "service.prerender.cloud"
-      });
-    });
-
+  function itReturnsPrerenderCloudResponse(extraHeaders = {}) {
     it("calls callback with prerendered body and headers", function() {
       expect(this.cb).toHaveBeenCalledWith(null, {
         status: "200",
@@ -47,6 +30,21 @@ describe("originRequest", function() {
           extraHeaders
         ),
         body: "prerendered-body"
+      });
+    });
+  }
+
+  function itForwardsRequestToPrerenderCloud(userAgent, uri) {
+    it("sends exact URL to prerender server with leading slash", function() {
+      expect(this.requestedPrerenderUri).toEqual(uri);
+    });
+
+    it("sends prerendercloud middleware user-agent, and curl x-original-user-agent, and gzip", function() {
+      expect(this.headersSentToServer).toEqual({
+        "user-agent": "prerender-cloud-nodejs-middleware",
+        "accept-encoding": "gzip",
+        "x-original-user-agent": userAgent,
+        host: "service.prerender.cloud"
       });
     });
   }
@@ -74,7 +72,7 @@ describe("originRequest", function() {
         self.requestedPrerenderUri = uri;
         self.headersSentToServer = this.req.headers;
         // return [200, "prerendered-body", {wut: 'kok'}];
-        return [200, "prerendered-body", { "content-type": "text/html" }];
+        return [200, self.prerenderedContent || "prerendered-body", { "content-type": "text/html" }];
       });
     this.handler = handler.originRequest;
     this.event = {
@@ -124,6 +122,12 @@ describe("originRequest", function() {
     });
   }
 
+  function withPrerenderedContent(content) {
+    beforeEach(function() {
+      this.prerenderedContent = content;
+    })
+  }
+
   describe("when shouldPrerender is true", function() {
     withInputs("whatever", "/index.html", true);
     runHandlerWithOriginRequestEvent();
@@ -132,11 +136,27 @@ describe("originRequest", function() {
       "whatever",
       "/http://d123.cf.net/index.html"
     );
+    itReturnsPrerenderCloudResponse()
   });
 
   describe("when shouldPrerender is false", function() {
     withInputs("whatever", "/index.html", false);
     runHandlerWithOriginRequestEvent();
+
+    itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
+  });
+
+  // lambda has a 256kb max response
+  describe("when shouldPrerender is true but size is over 256kb", function() {
+    withInputs("whatever", "/index.html", true);
+    withPrerenderedContent(new Buffer(256000));
+
+    runHandlerWithOriginRequestEvent();
+
+    itForwardsRequestToPrerenderCloud(
+      "whatever",
+      "/http://d123.cf.net/index.html"
+    );
 
     itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
   });
@@ -152,6 +172,7 @@ describe("originRequest", function() {
           "whatever",
           "/http://d123.cf.net/nested/path"
         );
+        itReturnsPrerenderCloudResponse()
       });
     });
     describe("when shouldPrerender is false", function() {
