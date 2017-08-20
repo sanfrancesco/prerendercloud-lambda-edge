@@ -2,17 +2,17 @@ if (!process.env["CLOUDFRONT_DISTRIBUTION_ID"]) {
   throw new Error("CLOUDFRONT_DISTRIBUTION_ID env var must be set");
 }
 
-CLOUDFRONT_DISTRIBUTION_ID = process.env["CLOUDFRONT_DISTRIBUTION_ID"]
+CLOUDFRONT_DISTRIBUTION_ID = process.env["CLOUDFRONT_DISTRIBUTION_ID"];
 
 const lambdaMappings = [
+  {
+    FunctionName: "Lambda-Edge-Prerendercloud-dev-viewerRequest",
+    EventType: "viewer-request"
+  },
   {
     FunctionName: "Lambda-Edge-Prerendercloud-dev-originRequest",
     EventType: "origin-request"
   },
-  {
-    FunctionName: "Lambda-Edge-Prerendercloud-dev-viewerRequest",
-    EventType: "viewer-request"
-  }
 ];
 
 const AWS = require("aws-sdk");
@@ -42,7 +42,7 @@ const getLatestVersion = lambdaMapping =>
 const updateCloudFront = (cloudFrontId, lambdaMappings) =>
   cloudfront.getDistributionConfig({ Id: cloudFrontId }).promise().then(res => {
     console.log(
-      "b4",
+      "before",
       res.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations
         .Items
     );
@@ -71,4 +71,15 @@ return Promise.all(
   .then(lambdaMappings =>
     updateCloudFront(CLOUDFRONT_DISTRIBUTION_ID, lambdaMappings)
   )
-  .then(console.log);
+  .catch(err => {
+    console.log(
+      "\n\n------Error while associating Lambda functions with CloudFront------\n\n"
+    );
+    console.error(err);
+    console.log("\n\n");
+  })
+  .then(res => {
+    console.log("\n\n")
+    // console.log(res)
+    console.log("\n\nSuccessfully associated Lambda functions with CloudFront\n\n")
+  })
