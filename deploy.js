@@ -12,7 +12,7 @@ const lambdaMappings = [
   {
     FunctionName: "Lambda-Edge-Prerendercloud-dev-originRequest",
     EventType: "origin-request"
-  },
+  }
 ];
 
 const AWS = require("aws-sdk");
@@ -21,13 +21,23 @@ AWS.config.region = "us-east-1";
 const lambda = new AWS.Lambda();
 const cloudfront = new AWS.CloudFront();
 
-const getLatestVersion = lambdaMapping =>
+const getLastPageOfVersions = (lambdaMapping, Marker) =>
   lambda
     .listVersionsByFunction({
       FunctionName: lambdaMapping.FunctionName,
-      MaxItems: 1000
+      MaxItems: 1000, // there's a bug that causes this to return 50 no matter what https://github.com/aws/aws-sdk-js/issues/1118
+      Marker
     })
     .promise()
+    .then(res => {
+      if (res.NextMarker)
+        return getLastPageOfVersions(lambdaMapping, res.NextMarker);
+
+      return res;
+    });
+
+const getLatestVersion = lambdaMapping =>
+  getLastPageOfVersions(lambdaMapping)
     .then(
       res =>
         res.Versions.sort(
@@ -79,7 +89,9 @@ return Promise.all(
     console.log("\n\n");
   })
   .then(res => {
-    console.log("\n\n")
-    // console.log(res)
-    console.log("\n\nSuccessfully associated Lambda functions with CloudFront\n\n")
-  })
+    console.log("\n\n");
+    // console.log(res);
+    console.log(
+      "\n\nSuccessfully associated Lambda functions with CloudFront\n\n"
+    );
+  });
