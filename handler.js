@@ -30,8 +30,11 @@ prerendercloud.set("timeout", 2700);
 
 module.exports.viewerRequest = (event, context, callback) => {
   const cloudFrontRequest = event.Records[0].cf.request;
+  console.log(JSON.stringify(cloudFrontRequest));
 
   prerendercloud.set("beforeRender", (req, done) => {
+    // FYI: if this block is called, it means we shouldPrerender
+
     // force the middleware to call res.writeHead and res.end immediately
     // instead of the remote prerender. (this allows us to use most of the
     // code from the prerendercloud lib and bail out at last moment)
