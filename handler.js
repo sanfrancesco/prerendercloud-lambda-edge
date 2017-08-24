@@ -6,29 +6,37 @@ const ViewerRequestInterface = require("./lib/ViewerRequestInterface");
 const OriginRequestInterface = require("./lib/OriginRequestInterface");
 
 const prerendercloud = require("prerendercloud");
-// if it takes longer than 2.7s, just bail out so we don't return an error
-// since Lambda@Edge max duration is 3s (and there seems to be ~300ms of overhead, sometimes more)
-prerendercloud.set("timeout", 2700);
+const resetPrerenderCloud = () => {
+  prerendercloud.resetOptions();
 
-// * CONFIGURATION *
+  // if it takes longer than 2.7s, just bail out so we don't return an error
+  // since Lambda@Edge max duration is 3s (and there seems to be ~300ms of overhead, sometimes more)
+  prerendercloud.set("timeout", 2700);
 
-// 1. prerenderToken (API token)
-//    get it after signing up at https://www.prerender.cloud/
-//    note: Lambda@Edge doesn't support env vars, so hardcoding is your only option
-// prerendercloud.set('prerenderToken', 'mySecretToken')
+  // * CONFIGURATION *
 
-// 2. botsOnly
-//    generally not recommended due to potential google SEO cloaking penalties no one fully understands
-// prerendercloud.set("botsOnly", true);
+  // 1. prerenderToken (API token)
+  //    get it after signing up at https://www.prerender.cloud/
+  //    note: Lambda@Edge doesn't support env vars, so hardcoding is your only option
+  // prerendercloud.set('prerenderToken', 'mySecretToken')
 
-// 3. removeScriptsTag
-//    removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
-// prerendercloud.set('removeScriptTags', true);
+  // 2. botsOnly
+  //    generally not recommended due to potential google SEO cloaking penalties no one fully understands
+  // prerendercloud.set("botsOnly", true);
 
-// 4. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 3. removeScriptsTag
+  //    removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
+  // prerendercloud.set('removeScriptTags', true);
 
+  // 4. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+
+  // for tests
+  if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
+};
 
 module.exports.viewerRequest = (event, context, callback) => {
+  resetPrerenderCloud();
+
   const cloudFrontRequest = event.Records[0].cf.request;
   console.log(JSON.stringify(cloudFrontRequest));
 
@@ -50,6 +58,8 @@ module.exports.viewerRequest = (event, context, callback) => {
 };
 
 module.exports.originRequest = (event, context, callback) => {
+  resetPrerenderCloud();
+
   // temporary until timeout function of prerendercloud or got is fixed
   // so it cancels request when timeout is reached
   // https://github.com/sindresorhus/got/issues/344
@@ -70,4 +80,10 @@ module.exports.originRequest = (event, context, callback) => {
   prerendercloud.set("shouldPrerender", () => shouldPrerender);
 
   prerendercloud(req, res, next);
+};
+
+// for tests
+var prerenderCloudOption;
+module.exports.setPrerenderCloudOption = cb => {
+  prerenderCloudOption = cb;
 };

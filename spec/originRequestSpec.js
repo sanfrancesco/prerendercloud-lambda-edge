@@ -1,11 +1,10 @@
 const handler = require("../handler");
 const nock = require("nock");
 const util = require("../lib/util");
-const prerendercloud = require("prerendercloud");
 
 describe("originRequest", function() {
   beforeEach(function() {
-    prerendercloud.resetOptions();
+    handler.setPrerenderCloudOption(prerendercloud => null);
     nock.cleanAll();
     nock.disableNetConnect();
   });

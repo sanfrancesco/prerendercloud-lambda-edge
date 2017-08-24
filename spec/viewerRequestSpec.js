@@ -1,6 +1,5 @@
 const handler = require("../handler");
 const nock = require("nock");
-const prerendercloud = require("prerendercloud");
 
 const util = require("../lib/util");
 
@@ -9,7 +8,7 @@ const createUriShouldNotPrerender = uri => util.createUri(uri, false);
 
 describe("viewerRequest", function() {
   beforeEach(function() {
-    prerendercloud.resetOptions();
+    handler.setPrerenderCloudOption(prerendercloud => null);
     nock.cleanAll();
     nock.disableNetConnect();
   });
@@ -158,9 +157,10 @@ describe("viewerRequest", function() {
 
   describe("with botsOnly user-agents", function() {
     beforeEach(function() {
-      prerendercloud.set("botsOnly", true);
+      handler.setPrerenderCloudOption(prerendercloud =>
+        prerendercloud.set("botsOnly", true)
+      );
     });
-
     // since shouldPrerender is true, it preserves uri for cache-key
     describe("twitterbot user-agent", function() {
       withUserAgentAndUri("twitterbot", "/nested/path");
