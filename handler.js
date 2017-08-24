@@ -9,9 +9,9 @@ const prerendercloud = require("prerendercloud");
 const resetPrerenderCloud = () => {
   prerendercloud.resetOptions();
 
-  // if it takes longer than 2.7s, just bail out so we don't return an error
+  // if it takes longer than 2.5s, just bail out so we don't return an error
   // since Lambda@Edge max duration is 3s (and there seems to be ~300ms of overhead, sometimes more)
-  prerendercloud.set("timeout", 2700);
+  prerendercloud.set("timeout", 2500);
 
   // * CONFIGURATION *
 
