@@ -46,6 +46,15 @@ Visit a URL associated with your CloudFront distribution. It will take ~3s for t
 
 See logs in CloudFront in region closest to where you made the request from (although the function is deployed to us-east-1, it is replicated in all regions).
 
+To view logs from command line:
+
+1. use an AWS account with `CloudWatchLogsReadOnlyAccess`
+2. `$ pip install awslogs` ( https://github.com/jorgebastida/awslogs )
+    * `AWS_REGION=us-west-2 awslogs get -s '1h' /aws/lambda/us-east-1.Lambda-Edge-Prerendercloud-dev-viewerRequest`
+    * `AWS_REGION=us-west-2 awslogs get -s '1h' /aws/lambda/us-east-1.Lambda-Edge-Prerendercloud-dev-originRequest`
+    * (change `AWS_REGION` to whatever region is closest to where you physically are since that's where the logs will be)
+    * (FYI, for some reason, San Francisco based requests are ending up in us-west-2)
+
 ## TODO
 
 * normalize trailing slash?
