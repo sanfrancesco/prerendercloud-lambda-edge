@@ -22,23 +22,30 @@ Read more:
 
 1. Edit [handler.js](/handler.js)
     * set your prerender.cloud API token (cmd+f for `prerenderToken`)
-2. remove your CloudFront custom error response that rewrites 404s to /index.html (this will replicate that functionality)
 
-## 3. Remove CloudFront custom error response
+## 3. Remove CloudFront custom error response for 404->index.html
+
+It has to be removed because it prevents the execution of the viewer-request function. This project replicates that functionality (see caveats)
 
 1. go here: https://console.aws.amazon.com/cloudfront/home
 2. click on your CloudFront distribution
 3. click the "error pages" tab
 4. make note of the TTL settings (in case you need to re-create it)
-5. and delete the custom error response (because having the custom error response prevents the `viewer-request` function from executing). We've replicated that functionality in this project (see caveats below)
+5. and delete the custom error response (because having the custom error response prevents the `viewer-request` function from executing).
 
-## 4. Deployment
+## 4. Add `s3:ListBucket` permission to CloudFront user
+
+Since we can't use the "custom error response", and we're implementing it ourselves, this permission is neccessary for CloudFront+Lambda@Edge to return a 404 for a requested file that doesn't exist (only non HTML files will return 404, see caveats below). If you don't add this, you'll get 403 forbidden instead.
+
+If you're not editing an IAM policy specifically, the UI/UX checkbox for this in the S3 interface is, for the bucket, under the "Permissions" tab, "List Objects"
+
+## 5. Deployment
 
 1. Use an AWS user (in your ~/.aws/credentials) with any of the following permissions: (full root, or see [serverless discussion](https://github.com/serverless/serverless/issues/1439) or you can use the following policies, which is _almost_ root: [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess])
 2. Set the following environment variables when deploying: CLOUDFRONT_DISTRIBUTION_ID
 3. `$ make deploy`
 
-## 5. You're done!
+## 6. You're done!
 
 Visit a URL associated with your CloudFront distribution. It will take ~3s for the first request. If it times out at 3s, it will just return (and cache) the non-prerendered copy. This is a short-term issue with Lambda@Edge. Work around it, for now, by crawling your SPA with prerender.cloud with a long cache-duration.
 
