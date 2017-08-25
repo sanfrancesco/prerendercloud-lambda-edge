@@ -67,11 +67,16 @@ describe("originRequest", function() {
     const self = this;
     this.prerenderServer = nock("https://service.prerender.cloud")
       .get(/.*/)
+      .delay(10)
       .reply(function(uri) {
         self.requestedPrerenderUri = uri;
         self.headersSentToServer = this.req.headers;
         // return [200, "prerendered-body", {wut: 'kok'}];
-        return [200, self.prerenderedContent || "prerendered-body", { "content-type": "text/html" }];
+        return [
+          200,
+          self.prerenderedContent || "prerendered-body",
+          { "content-type": "text/html" }
+        ];
       });
     this.handler = handler.originRequest;
     this.event = {
@@ -124,7 +129,7 @@ describe("originRequest", function() {
   function withPrerenderedContent(content) {
     beforeEach(function() {
       this.prerenderedContent = content;
-    })
+    });
   }
 
   describe("when shouldPrerender is true", function() {
@@ -135,7 +140,7 @@ describe("originRequest", function() {
       "whatever",
       "/http://d123.cf.net/index.html"
     );
-    itReturnsPrerenderCloudResponse()
+    itReturnsPrerenderCloudResponse();
   });
 
   describe("when shouldPrerender is false", function() {
@@ -143,6 +148,30 @@ describe("originRequest", function() {
     runHandlerWithOriginRequestEvent();
 
     itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
+  });
+
+  // on a timeout, it will call "next" which flows through to origin
+  // instead of prerendercloud, so we need to do the path rewrite to index.html
+  describe("when timeout", function() {
+    beforeEach(function() {
+      handler.setPrerenderCloudOption(prerendercloud =>
+        prerendercloud.set("timeout", 1)
+      );
+    });
+
+    describe("when an HTML file", function() {
+      withInputs("prerendercloud", "/some/path", true);
+      runHandlerWithOriginRequestEvent();
+
+      itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
+    });
+
+    describe("when a file with an extension", function() {
+      withInputs("prerendercloud", "/app.js", true);
+      runHandlerWithOriginRequestEvent();
+
+      itReturnsOriginalCloudFrontRequestWithNormalPath("/app.js");
+    });
   });
 
   // lambda has a 256kb max response
@@ -159,5 +188,4 @@ describe("originRequest", function() {
 
     itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
   });
-
 });
