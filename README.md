@@ -62,6 +62,9 @@ To view logs from command line:
 
 ## Caveats
 
-This rewrites all extensionless or HTML paths to /index.html, which is _almost_ the typical single-page app hosting behavior. Usually the path is checked for existence on the origin (s3) _before_ rewriting to index.html.
+1. This rewrites all extensionless or HTML paths to /index.html, which is _almost_ the typical single-page app hosting behavior. Usually the path is checked for existence on the origin (s3) _before_ rewriting to index.html.
+    * The consequence is that if you have a file on s3, for example, with a path of `/docs` (or docs.html, or /whatever, or whatever.html), it will not be served. Instead, `/index.html` will be served.
+    * We're waiting for the Lambda@Edge to add a feature to address this
+2. query strings [can't yet be forwarded](https://forums.aws.amazon.com/thread.jspa?threadID=251491&tstart=0)
+    * so if your app depends on query strings, or if you want to use `_escaped_fragment_`, it won't work
 
-The consequence is that if you have a file on s3, for example, with a path of `/docs` (or docs.html, or /whatever, or whatever.html), it will not be served. Instead, `/index.html` will be served.
