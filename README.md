@@ -67,4 +67,6 @@ To view logs from command line:
     * We're waiting for the Lambda@Edge to add a feature to address this
 2. query strings [can't yet be forwarded](https://forums.aws.amazon.com/thread.jspa?threadID=251491&tstart=0)
     * so if your app depends on query strings, or if you want to use `_escaped_fragment_`, it won't work
+3. redirects (301/302 status codes)
+    * if you use `<meta name="prerender-status-code" content="301">` to initiate a redirect, your CloudFront TTL must be zero, otherwise CloudFront will cache the body/response and return status code 200 with the body from the redirected path
 
