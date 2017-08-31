@@ -28,7 +28,11 @@ const resetPrerenderCloud = () => {
   //    removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
   // prerendercloud.set('removeScriptTags', true);
 
-  // 4. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 4. removeTrailingSlash
+  //    normalizes URLs to increase prerender.cloud server cache hit rate
+  // prerendercloud.set('removeTrailingSlash', true);
+
+  // 5. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
