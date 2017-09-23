@@ -15,8 +15,10 @@ Read more:
 
 ## 1. Install
 
-1. (use yarn because `npm install`'s package-lock.json causes serverless to send the dev dependencies from the node_modules directory which is too big for Lambda@Edge)
-2. `$ yarn`
+( Node v6, npm v3 )
+
+1. (as of Sep 2017, now you have to use `npm`. Not `yarn` - because now there's an issue with the latest yarn and serverless including dev dependencies in the Lambda zip)
+2. `$ npm install`
 
 ## 2. Usage/Configuration
 
