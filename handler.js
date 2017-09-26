@@ -20,19 +20,24 @@ const resetPrerenderCloud = () => {
   //    note: Lambda@Edge doesn't support env vars, so hardcoding is your only option
   // prerendercloud.set('prerenderToken', 'mySecretToken')
 
-  // 2. botsOnly
+  // 2. protocol
+  //    use this to force http or https instead of attempts to auto-detect it
+  //    useful if your origin is either http or https only
+  // prerendercloud.set('protocol', 'http');
+
+  // 3. botsOnly
   //    generally not recommended due to potential google SEO cloaking penalties no one fully understands
   // prerendercloud.set("botsOnly", true);
 
-  // 3. removeScriptsTag
+  // 4. removeScriptsTag
   //    removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
   // prerendercloud.set('removeScriptTags', true);
 
-  // 4. removeTrailingSlash
+  // 5. removeTrailingSlash
   //    normalizes URLs to increase prerender.cloud server cache hit rate
   // prerendercloud.set('removeTrailingSlash', true);
 
-  // 5. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 6. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
