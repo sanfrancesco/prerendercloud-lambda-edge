@@ -13,6 +13,9 @@ const resetPrerenderCloud = () => {
   // since Lambda@Edge max duration is 3s (and there seems to be ~300ms of overhead, sometimes more)
   prerendercloud.set("timeout", 2500);
 
+  // don't bother with retries since we only have 2.5s
+  prerendercloud.retries(0);
+
   // * CONFIGURATION *
 
   // 1. prerenderToken (API token)

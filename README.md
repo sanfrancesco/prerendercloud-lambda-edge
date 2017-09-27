@@ -15,10 +15,9 @@ Read more:
 
 ## 1. Install
 
-( Node v6, npm v3 )
+( Node v6, yarn v1.1.0 )
 
-1. (as of Sep 2017, now you have to use `npm`. Not `yarn` - because now there's an issue with the latest yarn and serverless including dev dependencies in the Lambda zip)
-2. `$ npm install`
+`$ yarn install`
 
 ## 2. Usage/Configuration
 
