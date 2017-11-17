@@ -14,33 +14,44 @@ const resetPrerenderCloud = () => {
   prerendercloud.set("timeout", 2500);
 
   // don't bother with retries since we only have 2.5s
-  prerendercloud.retries(0);
+  prerendercloud.set("retries", 0);
 
   // * CONFIGURATION *
 
   // 1. prerenderToken (API token)
   //    get it after signing up at https://www.prerender.cloud/
   //    note: Lambda@Edge doesn't support env vars, so hardcoding is your only option
-  // prerendercloud.set('prerenderToken', 'mySecretToken')
+  // prerendercloud.set("prerenderToken", "mySecretToken")
 
-  // 2. protocol
+  // 2. protocol (optional, default is http, so set this if your origin is https only)
   //    use this to force http or https instead of attempts to auto-detect it
   //    useful if your origin is either http or https only
-  // prerendercloud.set('protocol', 'http');
+  // prerendercloud.set("protocol", "http");
 
-  // 3. botsOnly
+  // 3. host (mandatory)
+  //    use this to force prerender.cloud to visit a certain host,
+  //    instead of inferring it from the environment. This is especially important
+  //    because in Lambda@Edge, the only host it can infer is the S3 origin
+  //    e.g.: d1pxreml448ujs.cloudfront.net or example.com (don't include the protocol)
+  // prerendercloud.set("host", "");
+
+  // 4. removeTrailingSlash (recommended)
+  //    removes trailing slash from URLs to increase prerender.cloud server cache hit rate
+  //    the only reason not to enable this is if you use "strict routing"
+  //    that is, you treat /docs/ differently than /docs (trailing slash) which is rare
+  // prerendercloud.set("removeTrailingSlash", true);
+
+  // 5. botsOnly
   //    generally not recommended due to potential google SEO cloaking penalties no one fully understands
   // prerendercloud.set("botsOnly", true);
 
-  // 4. removeScriptsTag
+  // 6. removeScriptsTag
   //    removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
-  // prerendercloud.set('removeScriptTags', true);
+  //    but this also means you're app will no longer be a "single-page app" since
+  //    all of the JavaScript will be gone (so we don't recommend this)
+  // prerendercloud.set("removeScriptTags", true);
 
-  // 5. removeTrailingSlash
-  //    normalizes URLs to increase prerender.cloud server cache hit rate
-  // prerendercloud.set('removeTrailingSlash', true);
-
-  // 6. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 7. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
@@ -99,3 +110,6 @@ var prerenderCloudOption;
 module.exports.setPrerenderCloudOption = cb => {
   prerenderCloudOption = cb;
 };
+
+// for validation
+module.exports.resetPrerenderCloud = resetPrerenderCloud;
