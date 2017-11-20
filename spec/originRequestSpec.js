@@ -53,7 +53,6 @@ describe("originRequest", function() {
       expect(this.cb).toHaveBeenCalledWith(null, {
         headers: {
           host: [{ value: "d123.cf.net", key: "Host" }],
-          // "user-agent": [{ value: "test-agent", key: "User-Agent" }]
           "user-agent": [{ value: "CloudFront", key: "User-Agent" }]
         },
         clientIp: "2001:cdba::3257:9652",
@@ -71,7 +70,6 @@ describe("originRequest", function() {
       .reply(function(uri) {
         self.requestedPrerenderUri = uri;
         self.headersSentToServer = this.req.headers;
-        // return [200, "prerendered-body", {wut: 'kok'}];
         return [
           200,
           self.prerenderedContent || "prerendered-body",
@@ -134,13 +132,31 @@ describe("originRequest", function() {
 
   describe("when shouldPrerender is true", function() {
     withInputs("whatever", "/index.html", true);
-    runHandlerWithOriginRequestEvent();
+    describe("without protocol", function() {
+      runHandlerWithOriginRequestEvent();
 
-    itForwardsRequestToPrerenderCloud(
-      "whatever",
-      "/http://d123.cf.net/index.html"
-    );
-    itReturnsPrerenderCloudResponse();
+      // defaults to https
+      itForwardsRequestToPrerenderCloud(
+        "whatever",
+        "/https://d123.cf.net/index.html"
+      );
+      itReturnsPrerenderCloudResponse();
+    });
+
+    describe("when protocol is forced to http", function() {
+      beforeEach(function() {
+        handler.setPrerenderCloudOption(prerendercloud =>
+          prerendercloud.set("protocol", "http")
+        );
+      });
+      runHandlerWithOriginRequestEvent();
+
+      itForwardsRequestToPrerenderCloud(
+        "whatever",
+        "/http://d123.cf.net/index.html"
+      );
+      itReturnsPrerenderCloudResponse();
+    });
   });
 
   describe("when shouldPrerender is false", function() {
@@ -183,7 +199,7 @@ describe("originRequest", function() {
 
     itForwardsRequestToPrerenderCloud(
       "whatever",
-      "/http://d123.cf.net/index.html"
+      "/https://d123.cf.net/index.html"
     );
 
     itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");

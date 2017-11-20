@@ -18,25 +18,26 @@ const resetPrerenderCloud = () => {
 
   // * CONFIGURATION *
 
-  // 1. prerenderToken (API token)
-  //    get it after signing up at https://www.prerender.cloud/
-  //    note: Lambda@Edge doesn't support env vars, so hardcoding is your only option
+  // 1. prerenderToken (API token, you'll be rate limited without it)
+  //    Get it after signing up at https://www.prerender.cloud/
+  //    note: Lambda@Edge doesn't support env vars, so hardcoding is your only option.
   // prerendercloud.set("prerenderToken", "mySecretToken")
 
-  // 2. protocol (optional, default is http, so set this if your origin is https only)
-  //    use this to force http or https instead of attempts to auto-detect it
-  //    useful if your origin is either http or https only
+  // 2. protocol (optional, default is https)
+  //    use this to force a certain protocol for requests from service.prerender.cloud to your origin
+  //    example use case: if your origin is http only
   // prerendercloud.set("protocol", "http");
 
   // 3. host (mandatory)
-  //    use this to force prerender.cloud to visit a certain host,
-  //    instead of inferring it from the environment. This is especially important
-  //    because in Lambda@Edge, the only host it can infer is the S3 origin
-  //    e.g.: d1pxreml448ujs.cloudfront.net or example.com (don't include the protocol)
+  //    Set this to your CloudFront distribution URL (or whatever your official host is).
+  //    This is what service.prerender.cloud will prerender, and if we didn't
+  //    set it, the only info we'd have access to during Lambda@Edge runtime is the host of the origin (S3)
+  //    which would require additional configuration to make it publicly accessible (and it just makes things more confusing).
+  //    example value: d1pxreml448ujs.cloudfront.net or example.com (don't include the protocol)
   // prerendercloud.set("host", "");
 
   // 4. removeTrailingSlash (recommended)
-  //    removes trailing slash from URLs to increase prerender.cloud server cache hit rate
+  //    Removes trailing slash from URLs to increase prerender.cloud server cache hit rate
   //    the only reason not to enable this is if you use "strict routing"
   //    that is, you treat /docs/ differently than /docs (trailing slash) which is rare
   // prerendercloud.set("removeTrailingSlash", true);
@@ -46,7 +47,7 @@ const resetPrerenderCloud = () => {
   // prerendercloud.set("botsOnly", true);
 
   // 6. removeScriptsTag
-  //    removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
+  //    Removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
   //    but this also means you're app will no longer be a "single-page app" since
   //    all of the JavaScript will be gone (so we don't recommend this)
   // prerendercloud.set("removeScriptTags", true);
@@ -61,7 +62,7 @@ module.exports.viewerRequest = (event, context, callback) => {
   resetPrerenderCloud();
 
   const cloudFrontRequest = event.Records[0].cf.request;
-  console.log(JSON.stringify(cloudFrontRequest));
+  console.log("viewerRequest", JSON.stringify(cloudFrontRequest));
 
   prerendercloud.set("beforeRender", (req, done) => {
     // FYI: if this block is called, it means we shouldPrerender
@@ -90,7 +91,7 @@ module.exports.originRequest = (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false;
 
   const cloudFrontRequest = event.Records[0].cf.request;
-  console.log(cloudFrontRequest);
+  console.log("originRequest", JSON.stringify(cloudFrontRequest));
 
   const { req, res, next, shouldPrerender } = OriginRequestInterface.create(
     cloudFrontRequest,
@@ -101,6 +102,11 @@ module.exports.originRequest = (event, context, callback) => {
   // for deciding when to prerender because we've already computed it
   // in the viewer-request, and encoded it into the URI, which is now in the `shouldPrerender` var
   prerendercloud.set("shouldPrerender", () => shouldPrerender);
+
+  console.log("originRequest calling service.prerender.cloud:", {
+    host: req.headers.host,
+    url: req.url
+  });
 
   prerendercloud(req, res, next);
 };
