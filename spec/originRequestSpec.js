@@ -1,6 +1,7 @@
 const handler = require("../handler");
 const nock = require("nock");
 const util = require("../lib/util");
+const zlib = require("zlib");
 
 describe("originRequest", function() {
   beforeEach(function() {
@@ -29,6 +30,24 @@ describe("originRequest", function() {
           extraHeaders
         ),
         body: "prerendered-body"
+      });
+    });
+  }
+
+  function itReturnsBase64edGzipResponse() {
+    it("calls callback with prerendered body and headers", function() {
+      expect(this.cb).toHaveBeenCalledWith(null, {
+        status: "200",
+        statusDescription: "OK",
+        headers: Object.assign(
+          {},
+          {
+            "content-type": [{ key: "content-type", value: "text/html" }],
+            "content-encoding": [{ key: "content-encoding", value: "gzip" }]
+          }
+        ),
+        body: zlib.gzipSync("prerendered-body").toString("base64"),
+        bodyEncoding: "base64"
       });
     });
   }
@@ -113,14 +132,22 @@ describe("originRequest", function() {
         uri,
         shouldPrerender
       );
-      const headerPlaceholder = (this.event.Records[0].cf.request.headers[
+      this.event.Records[0].cf.request.headers[
         "prerendercloud-lambda-edge-original-user-agent"
       ] = [
         {
           value: userAgent,
           key: "prerendercloud-lambda-edge-original-user-agent"
         }
-      ]);
+      ];
+    });
+  }
+
+  function withGzip() {
+    beforeEach(function() {
+      this.event.Records[0].cf.request.headers["accept-encoding"] = [
+        { key: "accept-encoding", value: "gzip" }
+      ];
     });
   }
 
@@ -132,6 +159,14 @@ describe("originRequest", function() {
 
   describe("when shouldPrerender is true", function() {
     withInputs("whatever", "/index.html", true);
+
+    describe("when accept-encoding supports gzip", function() {
+      withGzip();
+      runHandlerWithOriginRequestEvent();
+
+      itReturnsBase64edGzipResponse();
+    });
+
     describe("without protocol", function() {
       runHandlerWithOriginRequestEvent();
 
