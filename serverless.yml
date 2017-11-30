@@ -1,4 +1,6 @@
 
+# see limits on Lambda@Edge http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html#limits-lambda-at-edge
+
 service: Lambda-Edge-Prerendercloud
 
 # You can pin your service to only deploy with a specific Serverless version
@@ -31,10 +33,10 @@ provider:
 functions:
   viewerRequest:
     handler: handler.viewerRequest
-    timeout: 1
+    timeout: 5
   originRequest:
     handler: handler.originRequest
-    timeout: 3
+    timeout: 30
 
 # I created a Lambda@Edge function via the wizard in Lambda Console
 # and then copied the role and pasted it here

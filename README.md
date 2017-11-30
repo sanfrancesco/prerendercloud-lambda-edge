@@ -2,9 +2,13 @@
 
 # prerendercloud-lambda-edge
 
-Server-side rendering (prerendering) via Lambda@Edge for single-page apps hosted on CloudFront with an s3 origin.
+Server-side rendering (pre-rendering) via Lambda@Edge for single-page apps hosted on CloudFront with an s3 origin.
 
-This is a [serverless](https://github.com/serverless/serverless) project that deploys 2 functions to Lambda, and then associates them with your CloudFront distribution.
+This is a [serverless](https://github.com/serverless/serverless) project with a `make deploy` command that:
+
+1. deploys 2 functions to Lambda
+2. associates them with your CloudFront distribution
+3. clears/invalidates your CloudFront cache
 
 Read more:
 
@@ -87,7 +91,7 @@ If you're not editing an IAM policy specifically, the UI/UX checkbox for this in
 
 #### 10. You're done!
 
-Visit a URL associated with your CloudFront distribution. It will take ~3s for the first request. If it times out at 3s, it will just return (and cache) the non-prerendered copy. This is a short-term issue with Lambda@Edge. Work around it, for now, by crawling your SPA with prerender.cloud with a long cache-duration (more detail in caveats section)
+Visit a URL associated with your CloudFront distribution. It will take a few seconds for the first request (because it is pre-rendered on the first request). If for some reason the pre-render request fails or times out, the non-pre-rendered request will be cached.
 
 #### Viewing AWS Logs in CloudWatch
 
@@ -116,10 +120,8 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
 
 ## Caveats
 
-1. This solution probably won't work unless you cache your URLs into prerender.cloud's cache first
-    * This is because Lambda@Edge has a 3s timeout which is not enough time for the prerendering to complete
-    * The best practice then, is: crawling before invalidating the CloudFront distrubtion - just hit all of the URLs with [service.prerender.cloud](https://www.prerender.cloud/docs/api) and configure a prerender-cache-duration of something very long - like 1 week.
-    * alternatively you can set the CloudFront TTLs to 0s, so CloudFront will request from prerender.cloud servers on every request - so the first call would probably timeout, but the 2nd will not timeout and will come from prerender.cloud cache. This defeats the purpose of using CloudFront though, since you'll be hitting the "origin" (service.prerender.cloud) on every request.
+1. If you can't tolerate a slow first request (where subsequent requests are served from cache in CloudFront):
+    * crawl before invalidating the CloudFront distrubtion - just hit all of the URLs with [service.prerender.cloud](https://www.prerender.cloud/docs/api) and configure a `prerender-cache-duration` of something longer than the default of 5 minutes (300) - like 1 week (604800).
 2. This solution will serve index.html in place of something like `/some-special-file.html` even if `/some-special-file.html` exists on your origin
     * We're waiting for the Lambda@Edge to add a feature to address this
 3. Redirects (301/302 status codes)

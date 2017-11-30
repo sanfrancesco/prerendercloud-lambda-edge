@@ -1,5 +1,6 @@
 // http://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html
 // http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html
+// http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html#limits-lambda-at-edge
 
 "use strict";
 const ViewerRequestInterface = require("./lib/ViewerRequestInterface");
@@ -9,12 +10,11 @@ const prerendercloud = require("prerendercloud");
 const resetPrerenderCloud = () => {
   prerendercloud.resetOptions();
 
-  // if it takes longer than 2.5s, just bail out so we don't return an error
-  // since Lambda@Edge max duration is 3s (and there seems to be ~300ms of overhead, sometimes more)
-  prerendercloud.set("timeout", 2500);
-
-  // don't bother with retries since we only have 2.5s
-  prerendercloud.set("retries", 0);
+  // default prerender.cloud timeout is 10s
+  //   - so if it takes longer than 11s, either prerender.cloud is down or backed up
+  // max Lambda@Edge timeout is 30s
+  prerendercloud.set("retries", 1);
+  prerendercloud.set("timeout", 11000);
 
   // * CONFIGURATION *
 
