@@ -46,10 +46,12 @@ const resetPrerenderCloud = () => {
   //    generally not recommended due to potential google SEO cloaking penalties no one fully understands
   // prerendercloud.set("botsOnly", true);
 
-  // 6. removeScriptsTag
-  //    Removes all scripts/JS, useful if you trying to get under 256kb Lambda@Edge limit
-  //    but this also means you're app will no longer be a "single-page app" since
-  //    all of the JavaScript will be gone (so we don't recommend this)
+  // 6. removeScriptsTag (not recommended)
+  //    Removes all scripts/JS, useful if:
+  //      - trying to get under 1MB Lambda@Edge limit
+  //      - having problems with your JS app taking over from the pre-rendered content
+  //    Huge caveat: this also means your app will no longer be a "single-page app" since
+  //    all of the JavaScript will be gone
   // prerendercloud.set("removeScriptTags", true);
 
   // 7. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
