@@ -127,3 +127,12 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
 3. Redirects (301/302 status codes)
     * if you use `<meta name="prerender-status-code" content="301">` to initiate a redirect, your CloudFront TTL must be zero, otherwise CloudFront will cache the body/response and return status code 200 with the body from the redirected path
 4. No support for query strings yet
+
+## Troubleshooting
+
+* Read through the console output from the `make deploy` command and look for errors
+* Check your user-agent if using botsOnly
+* Sometimes (rarely) you'll see an error message on the webpage itself.
+* Check the AWS logs (see section "Viewing AWS Logs in CloudWatch")
+* Check Prerender.cloud logs (see section "Viewing Prerender.cloud logs")
+* Sometimes (rarely) there's an actual problem with AWS Lambda and you [may just need to re-deploy](https://www.reddit.com/r/aws/comments/7gumv7/question_aws_lambda_nodejs610_environment_issue/)
