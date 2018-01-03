@@ -54,7 +54,20 @@ const resetPrerenderCloud = () => {
   //    all of the JavaScript will be gone
   // prerendercloud.set("removeScriptTags", true);
 
-  // 7. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 7. disableServerCache
+  //    Disable the cache on prerender.cloud (default is enabled with 5 minute duration).
+  //    It probably makes sense to disable the prerender.cloud server cache
+  //    since CloudFront is caching things for you.
+  //    Pros/Cons of disabling prerender.cloud server cache:
+  //      Pros
+  //        - when you invalidate CloudFront, the next page load will be guaranteed fresh
+  //      Cons
+  //        - when you invalid CloudFront each page load will require a new prerender call
+  //          (so if you regularly invalidate even if the content hasn't changed, you're slowing
+  //           things down unnecessarily)
+  // prerendercloud.set('disableServerCache', true);
+
+  // 8. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
