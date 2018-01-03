@@ -83,13 +83,21 @@ Since we can't use the "custom error response", and we're implementing it oursel
 
 If you're not editing an IAM policy specifically, the UI/UX checkbox for this in the S3 interface is, for the bucket, under the "Permissions" tab, "List Objects"
 
-#### 9. Deployment
+#### 9. Deployment (of this Lambda@Edge function)
 
 1. Use an AWS user (in your ~/.aws/credentials) with any of the following permissions: (full root, or see [serverless discussion](https://github.com/serverless/serverless/issues/1439) or you can use the following policies, which are _almost_ root: [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess])
 2. Set the following environment variables when deploying: CLOUDFRONT_DISTRIBUTION_ID (or just edit the [Makefile](Makefile))
 3. `$ make deploy`
 
-#### 10. You're done!
+#### 10. Deployment (of your single-page application)
+
+1. sync/push the files to s3
+2. invalidate CloudFront
+3. you're done (no need to deploy the Lambda@Edge function)
+
+caveat: note that prerender.cloud has a 5-minute server cache that you can disable, see `disableServerCache` in [handler.js](/handler.js)
+
+#### 11. You're done!
 
 Visit a URL associated with your CloudFront distribution. It will take a few seconds for the first request (because it is pre-rendered on the first request). If for some reason the pre-render request fails or times out, the non-pre-rendered request will be cached.
 
