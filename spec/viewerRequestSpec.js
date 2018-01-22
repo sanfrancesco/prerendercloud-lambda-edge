@@ -3,7 +3,8 @@ const nock = require("nock");
 
 const util = require("../lib/util");
 
-const createUriShouldPrerender = uri => util.createUri(uri, true);
+const createUriShouldPrerender = (uri, querystring) =>
+  util.createUri(uri + (querystring ? `?${querystring}` : ""), true);
 const createUriShouldNotPrerender = uri => util.createUri(uri, false);
 
 describe("viewerRequest", function() {
@@ -20,16 +21,19 @@ describe("viewerRequest", function() {
     });
   }
 
-  function withUserAgentAndUri(userAgent, uri) {
+  function withUserAgentAndUri(userAgent, uri, querystring) {
     beforeEach(function() {
       this.event.Records[0].cf.request.uri = uri;
       this.event.Records[0].cf.request.headers[
         "user-agent"
       ][0].value = userAgent;
+      if (querystring) {
+        this.event.Records[0].cf.request.querystring = querystring;
+      }
     });
   }
 
-  function itPrerenders(userAgent, uri) {
+  function itPrerenders(userAgent, uri, querystring) {
     it("modifies request object with base64 encoded JSON string that has path and user-agent", function() {
       expect(this.cb).toHaveBeenCalledWith(null, {
         headers: {
@@ -40,13 +44,14 @@ describe("viewerRequest", function() {
           ]
         },
         clientIp: "2001:cdba::3257:9652",
-        uri: createUriShouldPrerender(uri),
+        uri: createUriShouldPrerender(uri, querystring),
+        querystring: querystring || "",
         method: "GET"
       });
     });
   }
 
-  function itDoesNotPrerender(userAgent, uri) {
+  function itDoesNotPrerender(userAgent, uri, querystring) {
     it("modifies request object with base64 encoded JSON string that has path and user-agent", function() {
       expect(this.cb).toHaveBeenCalledWith(null, {
         headers: {
@@ -54,7 +59,8 @@ describe("viewerRequest", function() {
           "user-agent": [{ value: userAgent, key: "User-Agent" }]
         },
         clientIp: "2001:cdba::3257:9652",
-        uri: createUriShouldNotPrerender(uri),
+        uri: createUriShouldNotPrerender(uri), // the URI will not include query string when not pre-rendering
+        querystring: querystring || "",
         method: "GET"
       });
     });
@@ -83,7 +89,8 @@ describe("viewerRequest", function() {
               },
               clientIp: "2001:cdba::3257:9652",
               uri: "/index.html",
-              method: "GET"
+              method: "GET",
+              querystring: ""
             }
           }
         }
@@ -112,6 +119,12 @@ describe("viewerRequest", function() {
           runHandlerWithViewerRequestEvent();
 
           itPrerenders("curl", "/index/");
+        });
+        describe("with query string", function() {
+          withUserAgentAndUri("curl", "/index.html", "a=b&c=d");
+          runHandlerWithViewerRequestEvent();
+
+          itPrerenders("curl", "/index.html", "a=b&c=d");
         });
       });
       describe("non html files", function() {
@@ -142,6 +155,20 @@ describe("viewerRequest", function() {
           runHandlerWithViewerRequestEvent();
 
           itDoesNotPrerender("prerendercloud random-suffix", "/index.html");
+        });
+        describe("with query string", function() {
+          withUserAgentAndUri(
+            "prerendercloud random-suffix",
+            "/index/",
+            "a=b&c=d"
+          );
+          runHandlerWithViewerRequestEvent();
+
+          itDoesNotPrerender(
+            "prerendercloud random-suffix",
+            "/index.html",
+            "a=b&c=d"
+          );
         });
       });
 

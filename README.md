@@ -134,7 +134,6 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
     * We're waiting for the Lambda@Edge to add a feature to address this
 3. Redirects (301/302 status codes)
     * if you use `<meta name="prerender-status-code" content="301">` to initiate a redirect, your CloudFront TTL must be zero, otherwise CloudFront will cache the body/response and return status code 200 with the body from the redirected path
-4. No support for query strings yet
 
 ## Troubleshooting
 
