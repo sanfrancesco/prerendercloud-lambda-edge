@@ -42,11 +42,18 @@ const resetPrerenderCloud = () => {
   //    that is, you treat /docs/ differently than /docs (trailing slash) which is rare
   // prerendercloud.set("removeTrailingSlash", true);
 
-  // 5. botsOnly
+  // 5. whitelistQueryParams (recommended)
+  //    improves cache hit rate by dropping query params not in the whitelist
+  //    must be a function that returns null or array
+  //    * default (null) preserves all query params
+  //    * empty array drops all query params
+  // prerendercloud.set("whitelistQueryParams", req => ["page"]);
+
+  // 6. botsOnly
   //    generally not recommended due to potential google SEO cloaking penalties no one fully understands
   // prerendercloud.set("botsOnly", true);
 
-  // 6. removeScriptsTag (not recommended)
+  // 7. removeScriptsTag (not recommended)
   //    Removes all scripts/JS, useful if:
   //      - trying to get under 1MB Lambda@Edge limit
   //      - having problems with your JS app taking over from the pre-rendered content
@@ -54,7 +61,7 @@ const resetPrerenderCloud = () => {
   //    all of the JavaScript will be gone
   // prerendercloud.set("removeScriptTags", true);
 
-  // 7. disableServerCache
+  // 8. disableServerCache
   //    Disable the cache on prerender.cloud (default is enabled with 5 minute duration).
   //    It probably makes sense to disable the prerender.cloud server cache
   //    since CloudFront is caching things for you.
@@ -67,7 +74,7 @@ const resetPrerenderCloud = () => {
   //           things down unnecessarily)
   // prerendercloud.set('disableServerCache', true);
 
-  // 8. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 9. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);

@@ -1300,9 +1300,9 @@ prepend-http@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
 
-prerendercloud@1.27.0:
-  version "1.27.0"
-  resolved "https://registry.yarnpkg.com/prerendercloud/-/prerendercloud-1.27.0.tgz#992c64a1420aeb20c02b2c19dd740d64a5ad8cff"
+prerendercloud@1.30.1:
+  version "1.30.1"
+  resolved "https://registry.yarnpkg.com/prerendercloud/-/prerendercloud-1.30.1.tgz#2e960a9b3865a588623f49007833be704aa9187d"
   dependencies:
     debug "^2.2.0"
     got-lite "^8.0.1"
