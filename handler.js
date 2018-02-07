@@ -29,11 +29,12 @@ const resetPrerenderCloud = () => {
   // prerendercloud.set("protocol", "http");
 
   // 3. host (mandatory)
-  //    Set this to your CloudFront distribution URL (or whatever your official host is).
+  //    Set this to your custom domain (something like example.com)
+  //    or if you don't have one, then the CloudFront distribution URL (something like d1pxreml448ujs.cloudfront.net)
   //    This is what service.prerender.cloud will prerender, and if we didn't
   //    set it, the only info we'd have access to during Lambda@Edge runtime is the host of the origin (S3)
   //    which would require additional configuration to make it publicly accessible (and it just makes things more confusing).
-  //    example value: d1pxreml448ujs.cloudfront.net or example.com (don't include the protocol)
+  //    example value: example.com or d1pxreml448ujs.cloudfront.net (don't include the protocol)
   // prerendercloud.set("host", "");
 
   // 4. removeTrailingSlash (recommended)
