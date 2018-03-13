@@ -6,11 +6,11 @@ destroy:
 deploy:
 	node ./validate.js
 	./node_modules/.bin/serverless deploy
-	CLOUDFRONT_DISTRIBUTION_ID="" node deploy.js
-	CLOUDFRONT_DISTRIBUTION_ID="" node create-invalidation.js
+	CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID}" node deploy.js
+	CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID}" node create-invalidation.js
 
 invalidate:
-	CLOUDFRONT_DISTRIBUTION_ID="" node create-invalidation.js
+	CLOUDFRONT_DISTRIBUTION_ID="${CLOUDFRONT_DISTRIBUTION_ID}" node create-invalidation.js
 
 listinvalidations:
 	aws cloudfront list-invalidations --distribution-id "" | head
