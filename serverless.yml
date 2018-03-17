@@ -15,12 +15,12 @@ provider:
   role: LambdaEdgeRole
 
 # you can overwrite defaults here
-#  stage: dev
+  stage: ${env:stage}
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
-
+  environment:
+    viewerName: dev    
+    originName: dev
 # you can add packaging information here
 #package:
 #  include:
@@ -31,7 +31,7 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  viewerRequest:
+  viewerRequest: 
     handler: handler.viewerRequest
     timeout: 5
   originRequest:
@@ -57,7 +57,7 @@ resources:
         Policies:
           - PolicyName: LambdaEdgeExecutionRole
             PolicyDocument:
-              Version: "2012-10-17"
+#              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
