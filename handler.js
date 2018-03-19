@@ -35,7 +35,7 @@ const resetPrerenderCloud = () => {
   //    set it, the only info we'd have access to during Lambda@Edge runtime is the host of the origin (S3)
   //    which would require additional configuration to make it publicly accessible (and it just makes things more confusing).
   //    example value: example.com or d1pxreml448ujs.cloudfront.net (don't include the protocol)
-  prerendercloud.set("host", "<red.test.com DNS CNAME to cloudfront>");
+  prerendercloud.set("host", "<red.test.com DNS Example CNAME>");
 
   // 4. removeTrailingSlash (recommended)
   //    Removes trailing slash from URLs to increase prerender.cloud server cache hit rate
