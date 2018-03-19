@@ -8,8 +8,8 @@ const viewjoin = 'Lambda-Edge-Prerendercloud-' + process.env["color"] + '-viewer
 const originjoin = 'Lambda-Edge-Prerendercloud-' + process.env["color"] + '-originRequest';
 const originName1 = process.env["originName"];
 const viewerName1 = process.env["viewerName"];
-const viewer = viewjoin + ':' + viewerName1;
-const origin = originjoin + ':' + originName1;
+const viewer = viewjoin //+ ':' + viewerName1;
+const origin = originjoin //+ ':' + originName1;
 console.log(viewer);
 console.log(origin);
 
