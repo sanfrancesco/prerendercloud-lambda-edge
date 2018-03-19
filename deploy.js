@@ -6,8 +6,8 @@ CLOUDFRONT_DISTRIBUTION_ID = process.env["CLOUDFRONT_DISTRIBUTION_ID"];
 
 const viewjoin = 'Lambda-Edge-Prerendercloud-' + process.env["color"] + '-viewerRequest';
 const originjoin = 'Lambda-Edge-Prerendercloud-' + process.env["color"] + '-originRequest';
-const originName1 = process.env["originName"];
-const viewerName1 = process.env["viewerName"];
+const originName1 = process.env["stage"];
+const viewerName1 = process.env["stage"];
 const viewer = viewjoin //+ ':' + viewerName1;
 const origin = originjoin //+ ':' + originName1;
 console.log(viewer);

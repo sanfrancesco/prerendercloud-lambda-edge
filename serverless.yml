@@ -16,11 +16,12 @@ provider:
 
 # you can overwrite defaults here
   stage: ${env:stage}
+  color: ${env:color}
 
-# you can define service wide environment variables here
-  environment:
-    viewerName: dev    
-    originName: dev
+# you can not define service wide environment variables here as Lambda won't accept them
+#  environment:
+#    viewerName: dev    
+#    originName: dev
 # you can add packaging information here
 #package:
 #  include:
