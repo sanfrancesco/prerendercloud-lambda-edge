@@ -1,6 +1,6 @@
 ![image](https://cloud.githubusercontent.com/assets/22159102/21554484/9d542f5a-cdc4-11e6-8c4c-7730a9e9e2d1.png)
 
-# prerendercloud-lambda-edge
+# Prerender CloudFront (prerendercloud-lambda-edge)
 
 Server-side rendering (pre-rendering) via Lambda@Edge for single-page apps hosted on CloudFront with an s3 origin.
 
