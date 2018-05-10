@@ -132,6 +132,7 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
     * crawl before invalidating the CloudFront distrubtion - just hit all of the URLs with [service.prerender.cloud](https://www.prerender.cloud/docs/api) and configure a `prerender-cache-duration` of something longer than the default of 5 minutes (300) - like 1 week (604800).
 2. This solution will serve index.html in place of something like `/some-special-file.html` even if `/some-special-file.html` exists on your origin
     * We're waiting for the Lambda@Edge to add a feature to address this
+    * in the meantime use the `blacklistPaths` option (see [handler.js](https://github.com/sanfrancesco/prerendercloud-lambda-edge/blob/ccd87b5484a4334d823dbb8f0df16e843b2dc910/handler.js#L81))
 3. Redirects (301/302 status codes)
     * if you use `<meta name="prerender-status-code" content="301">` to initiate a redirect, your CloudFront TTL must be zero, otherwise CloudFront will cache the body/response and return status code 200 with the body from the redirected path
 
