@@ -214,7 +214,9 @@ describe("originRequest", function() {
       withInputs("prerendercloud", "/some/path", true);
       runHandlerWithOriginRequestEvent();
 
-      itReturnsOriginalCloudFrontRequestWithNormalPath("/index.html");
+      // N.B. /some/path does NOT get rewritten to index.html in origin-request
+      // because it should have already been rewritten in viewer-request
+      itReturnsOriginalCloudFrontRequestWithNormalPath("/some/path");
     });
 
     describe("when a file with an extension", function() {
