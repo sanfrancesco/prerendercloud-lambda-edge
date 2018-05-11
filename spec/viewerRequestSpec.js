@@ -179,6 +179,35 @@ describe("viewerRequest", function() {
 
         itDoesNotPrerender("prerendercloud random-suffix", "/app.js");
       });
+
+      // blacklisted files should not be rewritten to index.html
+      describe("html files that are blacklisted", function() {
+        beforeEach(function() {
+          handler.setPrerenderCloudOption(prerendercloud =>
+            prerendercloud.set("blacklistPaths", req => ["/blacklisted.html"])
+          );
+        });
+        withUserAgentAndUri(
+          "prerendercloud random-suffix",
+          "/blacklisted.html"
+        );
+        runHandlerWithViewerRequestEvent();
+
+        itDoesNotPrerender("prerendercloud random-suffix", "/blacklisted.html");
+      });
+
+      // ensure conditional logic around blacklist doesn't break non html files
+      describe("non html while blacklist exists", function() {
+        beforeEach(function() {
+          handler.setPrerenderCloudOption(prerendercloud =>
+            prerendercloud.set("blacklistPaths", req => ["/blacklisted.html"])
+          );
+        });
+        withUserAgentAndUri("prerendercloud random-suffix", "/blacklisted.js");
+        runHandlerWithViewerRequestEvent();
+
+        itDoesNotPrerender("prerendercloud random-suffix", "/blacklisted.js");
+      });
     });
   });
 

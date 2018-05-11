@@ -7,8 +7,17 @@ const ViewerRequestInterface = require("./lib/ViewerRequestInterface");
 const OriginRequestInterface = require("./lib/OriginRequestInterface");
 
 const prerendercloud = require("prerendercloud");
+
+const origSet = prerendercloud.set;
+let cachedOptions = {};
+prerendercloud.set = function(optName, val) {
+  origSet.apply(undefined, arguments);
+  cachedOptions[optName] = val;
+};
+
 const resetPrerenderCloud = () => {
   prerendercloud.resetOptions();
+  cachedOptions = {};
 
   // default prerender.cloud timeout is 10s
   //   - so if it takes longer than 11s, either prerender.cloud is down or backed up
@@ -102,6 +111,7 @@ module.exports.viewerRequest = (event, context, callback) => {
   });
 
   const { req, res, next } = ViewerRequestInterface.create(
+    cachedOptions,
     cloudFrontRequest,
     callback
   );
@@ -131,10 +141,17 @@ module.exports.originRequest = (event, context, callback) => {
   // in the viewer-request, and encoded it into the URI, which is now in the `shouldPrerender` var
   prerendercloud.set("shouldPrerender", () => shouldPrerender);
 
-  console.log("originRequest calling service.prerender.cloud:", {
-    host: req.headers.host,
-    url: req.url
-  });
+  if (shouldPrerender) {
+    console.log("originRequest calling service.prerender.cloud:", {
+      host: req.headers.host,
+      url: req.url
+    });
+  } else {
+    console.log("originRequest calling next", {
+      host: req.headers.host,
+      url: req.url
+    });
+  }
 
   prerendercloud(req, res, next);
 };
