@@ -225,10 +225,10 @@ describe("originRequest", function() {
     });
   });
 
-  // lambda has a 256kb max response
-  describe("when shouldPrerender is true but size is over 256kb", function() {
+  // lambda has a 1mb max response
+  describe("when shouldPrerender is true but size is over 1mb", function() {
     withInputs("whatever", "/index.html", true);
-    withPrerenderedContent(new Buffer(256000));
+    withPrerenderedContent(new Buffer(1048001));
 
     runHandlerWithOriginRequestEvent();
 
