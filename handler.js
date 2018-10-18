@@ -63,7 +63,16 @@ const resetPrerenderCloud = () => {
   //    generally not recommended due to potential google SEO cloaking penalties no one fully understands
   // prerendercloud.set("botsOnly", true);
 
-  // 7. removeScriptsTag (not recommended)
+  // 7. metaOnly
+  //    only prerender the <title> and <meta> tags in the <head> section. The returned HTML payload will otherwise be unmodified.
+  //    useful if you don't care about server-side rendering but want open-graph previews to work everywhere
+  //    must be a function that receives a req object, and returns a bool
+  // eg1:
+  //   prerendercloud.set('metaOnly', req => req.url === "/long-page-insuitable-for-full-prerender" ? true : false);
+  // eg2:
+  //   prerendercloud.set('metaOnly', true);
+
+  // 8. removeScriptsTag (not recommended)
   //    Removes all scripts/JS, useful if:
   //      - trying to get under 1MB Lambda@Edge limit
   //      - having problems with your JS app taking over from the pre-rendered content
@@ -71,7 +80,7 @@ const resetPrerenderCloud = () => {
   //    all of the JavaScript will be gone
   // prerendercloud.set("removeScriptTags", true);
 
-  // 8. disableServerCache
+  // 9. disableServerCache
   //    Disable the cache on prerender.cloud (default is enabled with 5 minute duration).
   //    It probably makes sense to disable the prerender.cloud server cache
   //    since CloudFront is caching things for you.
@@ -84,12 +93,12 @@ const resetPrerenderCloud = () => {
   //           things down unnecessarily)
   // prerendercloud.set('disableServerCache', true);
 
-  // 9. blacklistPaths
+  // 10. blacklistPaths
   //    the viewer-request function can't see what files exist on origin so you may need this
   //    if you have HTML files that should not be pre-rendered (e.g. google/apple/fb verification files)
   // prerendercloud.set('blacklistPaths', req => ['/facebook-domain-verification.html']);
 
-  // 10. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 11. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
