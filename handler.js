@@ -70,7 +70,7 @@ const resetPrerenderCloud = () => {
   // eg1:
   //   prerendercloud.set('metaOnly', req => req.url === "/long-page-insuitable-for-full-prerender" ? true : false);
   // eg2:
-  //   prerendercloud.set('metaOnly', true);
+  //   prerendercloud.set('metaOnly', () => true);
 
   // 8. removeScriptsTag (not recommended)
   //    Removes all scripts/JS, useful if:
