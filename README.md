@@ -67,6 +67,8 @@ e.g. `botsOnly`, `removeTrailingSlash`
 
 #### 7. Remove CloudFront custom error response for 404->index.html
 
+**(this step is only necessary if you are using an existing CloudFront distribution)**
+
 If you created a new CloudFront distribution per the prerequisites instructions above, you can skip this. If you're using an existing CloudFront distribution, you need to remove this feature.
 
 It has to be removed because it prevents the execution of the viewer-request function. This project replicates that functionality (see caveats)
@@ -79,27 +81,30 @@ It has to be removed because it prevents the execution of the viewer-request fun
 
 #### 8. Add `s3:ListBucket` permission to CloudFront user
 
+**(this step is only necessary if you want 404s to work)**
+
 Since we can't use the "custom error response", and we're implementing it ourselves, this permission is neccessary for CloudFront+Lambda@Edge to return a 404 for a requested file that doesn't exist (only non HTML files will return 404, see caveats below). If you don't add this, you'll get 403 forbidden instead.
 
 If you're not editing an IAM policy specifically, the UI/UX checkbox for this in the S3 interface is, for the bucket, under the "Permissions" tab, "List Objects"
 
-#### 9. Deployment (of this Lambda@Edge function)
+#### 9. Lambda@Edge function Deployment (only needs to be done once)
 
-1. Use an AWS user (in your ~/.aws/credentials) with any of the following permissions: (full root, or see [serverless discussion](https://github.com/serverless/serverless/issues/1439) or you can use the following policies, which are _almost_ root: [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess])
-2. Set the following environment variables when deploying: CLOUDFRONT_DISTRIBUTION_ID (or just edit the [Makefile](Makefile))
-3. `$ make deploy`
+1. Make sure there's a "default" section in your ~/.aws/credentials file with aws_access_key_id/aws_secret_access_key that have any of the following permissions: (full root, or see [serverless discussion](https://github.com/serverless/serverless/issues/1439) or you can use the following policies, which are _almost_ root: [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess])
+2. now run: `$ CLOUDFRONT_DISTRIBUTION_ID=whateverYourDistributionIdIs make deploy`
+3. See the created Lambda function in Lambda: https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions
+4. See the created Lambda function in CloudFront: (refresh it, click your distribution, then the behaviors tab, then the checkbox + edit button for the first item in the list, then scroll to bottom of that page to see "Lambda Function Associations")
 
 #### 10. Deployment (of your single-page application)
 
 1. sync/push the files to s3
 2. invalidate CloudFront
-3. you're done (no need to deploy the Lambda@Edge function)
+3. you're done (no need to deploy the Lambda@Edge function after this initial setup)
 
 caveat: note that prerender.cloud has a 5-minute server cache that you can disable, see `disableServerCache` in [handler.js](/handler.js)
 
 #### 11. You're done!
 
-Visit a URL associated with your CloudFront distribution. It will take a few seconds for the first request (because it is pre-rendered on the first request). If for some reason the pre-render request fails or times out, the non-pre-rendered request will be cached.
+Visit a URL associated with your CloudFront distribution. **It will take a few seconds** for the first request (because it is pre-rendered on the first request). If for some reason the pre-render request fails or times out, the non-pre-rendered request will be cached.
 
 #### Viewing AWS Logs in CloudWatch
 
