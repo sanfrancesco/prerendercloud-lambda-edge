@@ -6,6 +6,6 @@
     "serverless": "1.24.1"
   },
   "dependencies": {
-    "prerendercloud": "1.37.2"
+    "prerendercloud": "1.39.0"
   }
 }

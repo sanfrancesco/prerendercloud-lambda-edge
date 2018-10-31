@@ -96,7 +96,8 @@ const resetPrerenderCloud = () => {
   // 10. blacklistPaths
   //    the viewer-request function can't see what files exist on origin so you may need this
   //    if you have HTML files that should not be pre-rendered (e.g. google/apple/fb verification files)
-  // prerendercloud.set('blacklistPaths', req => ['/facebook-domain-verification.html']);
+  //    trailing * works as a wildcard
+  // prerendercloud.set('blacklistPaths', req => ['/facebook-domain-verification.html', '/signin/*', '/google*']);
 
   // 11. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 

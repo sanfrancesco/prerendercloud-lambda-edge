@@ -196,6 +196,21 @@ describe("viewerRequest", function() {
         itDoesNotPrerender("prerendercloud random-suffix", "/blacklisted.html");
       });
 
+      describe("html files that are blacklisted as wildcard", function() {
+        beforeEach(function() {
+          handler.setPrerenderCloudOption(prerendercloud =>
+            prerendercloud.set("blacklistPaths", req => ["/signin/*"])
+          );
+        });
+        withUserAgentAndUri(
+          "prerendercloud random-suffix",
+          "/signin/oauth"
+        );
+        runHandlerWithViewerRequestEvent();
+
+        itDoesNotPrerender("prerendercloud random-suffix", "/signin/oauth");
+      });
+
       // ensure conditional logic around blacklist doesn't break non html files
       describe("non html while blacklist exists", function() {
         beforeEach(function() {
