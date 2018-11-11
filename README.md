@@ -6,9 +6,9 @@ Server-side rendering (pre-rendering) via Lambda@Edge for single-page apps hoste
 
 This is a [serverless](https://github.com/serverless/serverless) project with a `make deploy` command that:
 
-1. deploys 2 functions to Lambda
-2. associates them with your CloudFront distribution
-3. clears/invalidates your CloudFront cache
+1. [serverless.yml](serverless.yml) deploys 3 functions to Lambda (`viewerRequest`, `originRequest`, `originResponse`)
+2. [deploy.js](deploy.js) associates them with your CloudFront distribution
+3. [create-invalidation.js](create-invalidation.js) clears/invalidates your CloudFront cache
 
 Read more:
 
@@ -53,11 +53,11 @@ Note, you **will not be creating** a CloudFront "custom error response" that red
 
 #### 4. Hardcode your prerender.cloud auth token
 
-Edit [handler.js](/handler.js) and set your prerender.cloud API token (cmd+f for `prerenderToken`)
+Edit [handler.js](handler.js) and set your prerender.cloud API token (cmd+f for `prerenderToken`)
 
 #### 5. Hardcode your CloudFront URL
 
-Edit [handler.js](/handler.js) and set your CLoudFront distribution URL or whatever domain is aliased to your CloudFront distribution (cmd+f for `host`).
+Edit [handler.js](handler.js) and set your CLoudFront distribution URL or whatever domain is aliased to your CloudFront distribution (cmd+f for `host`).
 
 If you don't set this, the Lambda@Edge will see the host as the S3 origin, which means that's what prerender.cloud will attempt to hit which means you'd need to configure your s3 origin to be publicly accessible. Plus, it's usually better for prerender.cloud to prerender against the canonical URL, not the S3 origin.
 
@@ -69,7 +69,7 @@ e.g. `botsOnly`, `removeTrailingSlash`
 
 **(this step is only necessary if you are using an existing CloudFront distribution)**
 
-If you created a new CloudFront distribution per the prerequisites instructions above, you can skip this. If you're using an existing CloudFront distribution, you need to remove this feature.
+If you're using an existing CloudFront distribution, you need to remove this feature.
 
 It has to be removed because it prevents the execution of the viewer-request function. This project replicates that functionality (see caveats)
 
@@ -85,7 +85,26 @@ It has to be removed because it prevents the execution of the viewer-request fun
 
 Since we can't use the "custom error response", and we're implementing it ourselves, this permission is neccessary for CloudFront+Lambda@Edge to return a 404 for a requested file that doesn't exist (only non HTML files will return 404, see caveats below). If you don't add this, you'll get 403 forbidden instead.
 
+1. go to [s3 console](https://console.aws.amazon.com/s3/home?region=us-east-1)
+2. click on the bucket you created in step 1 for this project
+3. click "permissions"
+4. click "bucket policy"
+5. modify the Action and Resource to each be an array, they should look like (change the bucket name in resource as appropriate):
+
+```
+"Action": [
+    "s3:GetObject",
+    "s3:ListBucket"
+],
+"Resource": [
+    "arn:aws:s3:::CHANGE_THIS_TO_YOUR_BUCKET_NAME_FROM_STEP_1/*",
+    "arn:aws:s3:::CHANGE_THIS_TO_YOUR_BUCKET_NAME_FROM_STEP_1"
+]
+```
+
 If you're not editing an IAM policy specifically, the UI/UX checkbox for this in the S3 interface is, for the bucket, under the "Permissions" tab, "List Objects"
+
+You can modify the content of the 404 page in [handler.js](handler.js)
 
 #### 9. Lambda@Edge function Deployment (only needs to be done once)
 

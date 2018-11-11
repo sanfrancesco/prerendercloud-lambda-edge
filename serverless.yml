@@ -37,6 +37,9 @@ functions:
   originRequest:
     handler: handler.originRequest
     timeout: 30
+  originResponse:
+    handler: handler.originResponse
+    timeout: 5
 
 # I created a Lambda@Edge function via the wizard in Lambda Console
 # and then copied the role and pasted it here

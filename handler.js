@@ -166,6 +166,27 @@ module.exports.originRequest = (event, context, callback) => {
   prerendercloud(req, res, next);
 };
 
+module.exports.originResponse = (event, context, callback) => {
+  const cloudFrontResponse = event.Records[0].cf.response;
+  // console.log("originResponse", JSON.stringify(cloudFrontResponse));
+
+  if (cloudFrontResponse.status === "404") {
+    cloudFrontResponse.body = `
+      <html>
+        <head>
+          <title>Not Found</title>
+        </head>
+        <body>404 - Not Found</body>
+      </html>
+    `;
+    cloudFrontResponse.headers["content-type"] = [
+      { key: "Content-Type", value: "text/html" }
+    ];
+  }
+
+  callback(null, cloudFrontResponse);
+};
+
 // for tests
 var prerenderCloudOption;
 module.exports.setPrerenderCloudOption = cb => {

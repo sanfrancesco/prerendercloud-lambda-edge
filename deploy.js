@@ -12,6 +12,10 @@ const lambdaMappings = [
   {
     FunctionName: "Lambda-Edge-Prerendercloud-dev-originRequest",
     EventType: "origin-request"
+  },
+  {
+    FunctionName: "Lambda-Edge-Prerendercloud-dev-originResponse",
+    EventType: "origin-response"
   }
 ];
 
