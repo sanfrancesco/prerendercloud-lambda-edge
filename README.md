@@ -1,5 +1,11 @@
 # Prerender CloudFront (via AWS Lambda@Edge)
 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=SsMNQ3EaNZ0
+" target="_blank"><img src="https://img.youtube.com/vi/SsMNQ3EaNZ0/sddefault.jpg"
+alt="4min how-to set up lambda@edge for pre-rendering" width="240" height="180" border="10" />
+</a><br />
+4-minute YouTube video walk-through: [https://youtu.be/SsMNQ3EaNZ0](https://youtu.be/SsMNQ3EaNZ0)
+
 ![image](https://cloud.githubusercontent.com/assets/22159102/21554484/9d542f5a-cdc4-11e6-8c4c-7730a9e9e2d1.png)
 
 Server-side rendering (pre-rendering) via Lambda@Edge for single-page apps hosted on CloudFront with an s3 origin.
