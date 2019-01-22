@@ -72,15 +72,7 @@ const resetPrerenderCloud = () => {
   // eg2:
   //   prerendercloud.set('metaOnly', () => true);
 
-  // 8. removeScriptsTag (not recommended)
-  //    Removes all scripts/JS, useful if:
-  //      - trying to get under 1MB Lambda@Edge limit
-  //      - having problems with your JS app taking over from the pre-rendered content
-  //    Huge caveat: this also means your app will no longer be a "single-page app" since
-  //    all of the JavaScript will be gone
-  // prerendercloud.set("removeScriptTags", true);
-
-  // 9. disableServerCache
+  // 8. disableServerCache
   //    Disable the cache on prerender.cloud (default is enabled with 5 minute duration).
   //    It probably makes sense to disable the prerender.cloud server cache
   //    since CloudFront is caching things for you.
@@ -93,13 +85,35 @@ const resetPrerenderCloud = () => {
   //           things down unnecessarily)
   // prerendercloud.set('disableServerCache', true);
 
-  // 10. blacklistPaths
+  // 9. blacklistPaths
   //    the viewer-request function can't see what files exist on origin so you may need this
   //    if you have HTML files that should not be pre-rendered (e.g. google/apple/fb verification files)
   //    trailing * works as a wildcard
   // prerendercloud.set('blacklistPaths', req => ['/facebook-domain-verification.html', '/signin/*', '/google*']);
 
-  // 11. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 10. removeScriptsTag (not recommended)
+  //    Removes all scripts/JS, useful if:
+  //      - trying to get under 1MB Lambda@Edge limit
+  //      - having problems with your JS app taking over from the pre-rendered content
+  //    Huge caveat: this also means your app will no longer be a "single-page app" since
+  //    all of the JavaScript will be gone
+  // prerendercloud.set("removeScriptTags", true);
+
+  // 11. disableAjaxPreload
+  //    "Ajax Preload" is a monkey-patch, included by default when metaOnly is false/null.
+  //     It prevents screen flicker/repaint/flashing, but increases initial page load size
+  //     (because it embeds the AJAX responses into your HTML).
+  //     you can disable this if:
+  //       * you have metaOnly set to true
+  //       * you don't make any AJAX/XHR requests
+  //       * you don't care about a brief flicker/flash
+  //       * or finally, the best option: you manage your own via prerender.cloud's __PRELOADED_STATE__ special global var
+  //     Read more:
+  //       - https://www.prerender.cloud/docs/server-client-transition
+  //       - https://github.com/sanfrancesco/prerendercloud-ajaxmonkeypatch
+  // prerendercloud.set("disableAjaxPreload", true);
+
+  // 12. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
