@@ -161,6 +161,7 @@ module.exports.originRequest = (event, context, callback) => {
   console.log("originRequest", JSON.stringify(cloudFrontRequest));
 
   const { req, res, next, shouldPrerender } = OriginRequestInterface.create(
+    cachedOptions,
     cloudFrontRequest,
     callback
   );
