@@ -53,7 +53,7 @@ Note, you **will not be creating** a CloudFront "custom error response" that red
 
 #### 3. Install Dependencies
 
-( Node v6, yarn >= v1.1.0 ) (note, yarn before v1.1.0 has a bug that causes dev deps to be installed)
+( Node v8, yarn >= v1.1.0 ) (note, yarn before v1.1.0 has a bug that causes dev deps to be installed)
 
 `$ yarn install`
 
@@ -61,17 +61,11 @@ Note, you **will not be creating** a CloudFront "custom error response" that red
 
 Edit [handler.js](handler.js) and set your prerender.cloud API token (cmd+f for `prerenderToken`)
 
-#### 5. Hardcode your CloudFront URL
+#### 5. Edit any other configs (optional)
 
-Edit [handler.js](handler.js) and set your CLoudFront distribution URL or whatever domain is aliased to your CloudFront distribution (cmd+f for `host`).
+e.g. `botsOnly`, `removeTrailingSlash` in [handler.js](handler.js)
 
-If you don't set this, the Lambda@Edge will see the host as the S3 origin, which means that's what prerender.cloud will attempt to hit which means you'd need to configure your s3 origin to be publicly accessible. Plus, it's usually better for prerender.cloud to prerender against the canonical URL, not the S3 origin.
-
-#### 6. Edit any other configs (optional)
-
-e.g. `botsOnly`, `removeTrailingSlash`
-
-#### 7. Remove CloudFront custom error response for 404->index.html
+#### 6. Remove CloudFront custom error response for 404->index.html
 
 **(this step is only necessary if you are using an existing CloudFront distribution)**
 
@@ -85,7 +79,7 @@ It has to be removed because it prevents the execution of the viewer-request fun
 4. make note of the TTL settings (in case you need to re-create it)
 5. and delete the custom error response (because having the custom error response prevents the `viewer-request` function from executing).
 
-#### 8. Add `s3:ListBucket` permission to CloudFront user
+#### 7. Add `s3:ListBucket` permission to CloudFront user
 
 **(this step is only necessary if you want 404s to work)**
 
@@ -112,14 +106,14 @@ If you're not editing an IAM policy specifically, the UI/UX checkbox for this in
 
 You can modify the content of the 404 page in [handler.js](handler.js)
 
-#### 9. Lambda@Edge function Deployment (only needs to be done once)
+#### 8. Lambda@Edge function Deployment (only needs to be done once, or whenever you `git pull` from this repo)
 
 1. Make sure there's a "default" section in your ~/.aws/credentials file with aws_access_key_id/aws_secret_access_key that have any of the following permissions: (full root, or see [serverless discussion](https://github.com/serverless/serverless/issues/1439) or you can use the following policies, which are _almost_ root: [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess])
 2. now run: `$ CLOUDFRONT_DISTRIBUTION_ID=whateverYourDistributionIdIs make deploy`
 3. See the created Lambda function in Lambda: https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions
 4. See the created Lambda function in CloudFront: (refresh it, click your distribution, then the behaviors tab, then the checkbox + edit button for the first item in the list, then scroll to bottom of that page to see "Lambda Function Associations")
 
-#### 10. Deployment (of your single-page application)
+#### 9. Deployment (of your single-page application)
 
 1. sync/push the files to s3
 2. invalidate CloudFront
@@ -127,7 +121,7 @@ You can modify the content of the 404 page in [handler.js](handler.js)
 
 caveat: note that prerender.cloud has a 5-minute server cache that you can disable, see `disableServerCache` in [handler.js](/handler.js)
 
-#### 11. You're done!
+#### 10. You're done!
 
 Visit a URL associated with your CloudFront distribution. **It will take a few seconds** for the first request (because it is pre-rendered on the first request). If for some reason the pre-render request fails or times out, the non-pre-rendered request will be cached.
 
