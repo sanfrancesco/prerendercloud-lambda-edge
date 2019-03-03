@@ -71,7 +71,7 @@ describe("originRequest", function() {
     it("returns original CloudFront request with normal path", function() {
       expect(this.cb).toHaveBeenCalledWith(null, {
         headers: {
-          host: [{ value: "d123.cf.net", key: "Host" }],
+          host: [{ value: "origin-request-gets-s3-origin.s3.amazonaws.com", key: "Host" }],
           "user-agent": [{ value: "CloudFront", key: "User-Agent" }]
         },
         clientIp: "2001:cdba::3257:9652",
@@ -104,7 +104,7 @@ describe("originRequest", function() {
               headers: {
                 host: [
                   {
-                    value: "d123.cf.net",
+                    value: "origin-request-gets-s3-origin.s3.amazonaws.com",
                     key: "Host"
                   }
                 ],
@@ -130,7 +130,8 @@ describe("originRequest", function() {
     beforeEach(function() {
       this.event.Records[0].cf.request.uri = util.createUri(
         uri,
-        shouldPrerender
+        shouldPrerender,
+        "d123.cf.net"
       );
       this.event.Records[0].cf.request.headers[
         "prerendercloud-lambda-edge-original-user-agent"

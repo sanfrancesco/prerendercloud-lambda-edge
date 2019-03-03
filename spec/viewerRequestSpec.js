@@ -3,9 +3,10 @@ const nock = require("nock");
 
 const util = require("../lib/util");
 
-const createUriShouldPrerender = (uri, querystring) =>
-  util.createUri(uri + (querystring ? `?${querystring}` : ""), true);
-const createUriShouldNotPrerender = uri => util.createUri(uri, false);
+const createUriShouldPrerender = (uri, querystring, host = "d123.cf.net") =>
+  util.createUri(uri + (querystring ? `?${querystring}` : ""), true, host);
+const createUriShouldNotPrerender = (uri) =>
+  util.createUri(uri, false);
 
 describe("viewerRequest", function() {
   beforeEach(function() {
@@ -202,10 +203,7 @@ describe("viewerRequest", function() {
             prerendercloud.set("blacklistPaths", req => ["/signin/*"])
           );
         });
-        withUserAgentAndUri(
-          "prerendercloud random-suffix",
-          "/signin/oauth"
-        );
+        withUserAgentAndUri("prerendercloud random-suffix", "/signin/oauth");
         runHandlerWithViewerRequestEvent();
 
         itDoesNotPrerender("prerendercloud random-suffix", "/signin/oauth");
