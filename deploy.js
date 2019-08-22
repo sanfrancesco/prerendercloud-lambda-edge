@@ -44,9 +44,10 @@ const getLatestVersion = lambdaMapping =>
   getLastPageOfVersions(lambdaMapping)
     .then(
       res =>
-        res.Versions.sort(
-          (a, b) => (parseInt(a.Version) > parseInt(b.Version) ? -1 : 1)
-        )[0]
+        res.Versions.reduce((prev, curr) => (
+          isNaN(curr.Version)
+          || parseInt(prev.Version) > parseInt(curr.Version) ? prev : curr
+        ))
     )
     .then(latest => ({
       EventType: lambdaMapping.EventType,
