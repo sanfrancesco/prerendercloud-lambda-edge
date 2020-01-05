@@ -164,7 +164,7 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
 
 ## Updating Node.js runtime
 
-Simply update [serverless.yaml](./serverless.yml) to the [latest or whatever you prefer](https://docs.aws.amazon.com/lambda/latest/dg//lambda-runtimes.html) and re-deploy: `make deploy`
+Simply update [serverless.yaml](./serverless.yml) to the [latest or whatever you prefer](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-requirements-limits.html#lambda-requirements-lambda-function-configuration) and re-deploy: `make deploy`
 
 ## Troubleshooting
 
