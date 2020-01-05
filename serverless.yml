@@ -22,13 +22,19 @@ provider:
 #    variable1: value1
 
 # you can add packaging information here
-#package:
+package:
 #  include:
 #    - include-me.js
 #    - include-me-dir/**
-#  exclude:
-#    - exclude-me.js
-#    - exclude-me-dir/**
+ exclude:
+   - spec/**
+   - package-lock.json
+   - yarn.lock
+   - README.md
+   - deploy.js
+   - create-invalidation.js
+   - LICENSE
+   - Makefile
 
 functions:
   viewerRequest:

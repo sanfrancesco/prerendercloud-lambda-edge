@@ -3,7 +3,7 @@
     "aws-sdk": "^2.94.0",
     "jasmine": "^2.7.0",
     "nock": "^9.0.14",
-    "serverless": "1.38.0"
+    "serverless": "1.60.5"
   },
   "dependencies": {
     "prerendercloud": "1.40.1"

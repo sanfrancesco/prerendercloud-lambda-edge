@@ -55,9 +55,9 @@ Note, you **will not be creating** a CloudFront "custom error response" that red
 
 #### 3. Install Dependencies
 
-( Node v8, yarn >= v1.1.0 ) (note, yarn before v1.1.0 has a bug that causes dev deps to be installed)
+Node v10, and npm. (yarn is not sufficient)
 
-`$ yarn install`
+`$ npm install`
 
 #### 4. Hardcode your prerender.cloud auth token
 
