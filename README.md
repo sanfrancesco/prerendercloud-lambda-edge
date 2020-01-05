@@ -162,6 +162,10 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
 3. Redirects (301/302 status codes)
     * if you use `<meta name="prerender-status-code" content="301">` to initiate a redirect, your CloudFront TTL must be zero, otherwise CloudFront will cache the body/response and return status code 200 with the body from the redirected path
 
+## Updating Node.js runtime
+
+Simply update [serverless.yaml](./serverless.yml) to the [latest or whatever you prefer](https://docs.aws.amazon.com/lambda/latest/dg//lambda-runtimes.html) and re-deploy: `make deploy`
+
 ## Troubleshooting
 
 * Read through the console output from the `make deploy` command and look for errors
