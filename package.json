@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "aws-sdk": "^2.94.0",
+    "aws-sdk": "^2.814.0",
     "jasmine": "^2.7.0",
     "nock": "^9.0.14",
     "serverless": "1.60.5"
