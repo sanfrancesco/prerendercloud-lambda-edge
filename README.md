@@ -2,11 +2,13 @@
 
 # Prerender CloudFront (via AWS Lambda@Edge)
 
+![Github Actions CI](https://github.com/sanfrancesco/prerendercloud-lambda-edge/actions/workflows/node.js.yml/badge.svg)
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=SsMNQ3EaNZ0
 " target="_blank"><img src="https://img.youtube.com/vi/SsMNQ3EaNZ0/sddefault.jpg"
 alt="4min how-to set up lambda@edge for pre-rendering" width="240" height="180" border="10" />
 </a><br />
-4-minute YouTube video walk-through: [https://youtu.be/SsMNQ3EaNZ0](https://youtu.be/SsMNQ3EaNZ0)
+4-minute YouTube video walk-through (2022-04-25 update: AWS UI/UX has slightly changed since video but the video is still accurate): [https://youtu.be/SsMNQ3EaNZ0](https://youtu.be/SsMNQ3EaNZ0)
 
 ![image](https://cloud.githubusercontent.com/assets/22159102/21554484/9d542f5a-cdc4-11e6-8c4c-7730a9e9e2d1.png)
 
@@ -55,7 +57,7 @@ Note, you **will not be creating** a CloudFront "custom error response" that red
 
 #### 3. Install Dependencies
 
-Node v10, and npm. (yarn is not sufficient)
+Node v14, and npm
 
 `$ npm install`
 
