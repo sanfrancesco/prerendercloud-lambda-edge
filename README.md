@@ -2,6 +2,8 @@
 
 # Prerender CloudFront (via AWS Lambda@Edge)
 
+![Github Actions CI](https://github.com/sanfrancesco/prerendercloud-lambda-edge/actions/workflows/node.js.yml/badge.svg)
+
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=SsMNQ3EaNZ0
 " target="_blank"><img src="https://img.youtube.com/vi/SsMNQ3EaNZ0/sddefault.jpg"
 alt="4min how-to set up lambda@edge for pre-rendering" width="240" height="180" border="10" />
