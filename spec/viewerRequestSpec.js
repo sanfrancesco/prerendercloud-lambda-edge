@@ -240,7 +240,7 @@ describe("viewerRequest", function() {
 
     // since shouldPrerender is false, it rewrites uri for cache-key
     describe("curl user-agent", function() {
-      withUserAgentAndUri("curl", "/nexted/path");
+      withUserAgentAndUri("curl", "/nested/path");
       runHandlerWithViewerRequestEvent();
 
       itDoesNotPrerender("curl", "/index.html");
