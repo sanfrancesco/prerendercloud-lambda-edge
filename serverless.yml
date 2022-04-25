@@ -26,6 +26,7 @@ package:
 #  include:
 #    - include-me.js
 #    - include-me-dir/**
+ excludeDevDependencies: true
  exclude:
    - spec/**
    - package-lock.json
