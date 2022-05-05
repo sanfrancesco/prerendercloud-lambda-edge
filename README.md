@@ -1,4 +1,4 @@
-**Note:** please test your app with a simple all-in-one solution here: https://github.com/sanfrancesco/prerendercloud-server before going through this Lambda@Edge+CloudFront setup process. Once that's debugged and working the way you want it, come back here to configure Lambda@Edge+CloudFront.
+**Note: please first test your app** with our quick and simple all-in-one solution here: https://github.com/sanfrancesco/prerendercloud-server before going through this Lambda@Edge+CloudFront setup process. Once that's debugged and working the way you want it, come back here to configure Lambda@Edge+CloudFront. This will save you hours of headache because debugging/iterating with Cloudfront/Lambda/S3 is slow.
 
 # Pre-render CloudFront (via AWS Lambda@Edge)
 
@@ -13,7 +13,7 @@
 alt="4min how-to set up lambda@edge for pre-rendering" width="240" height="180" border="10" />
 </a><br />
 
-Server-side rendering (pre-rendering) via Lambda@Edge for single-page apps hosted on CloudFront with an s3 origin.
+Server-side rendering (pre-rendering) via Lambda@Edge for single-page apps hosted on CloudFront with an s3 origin. It forwards requests to [Headless-Render-API.com](https://headless-render-api.com) to be pre-rendered using a headless Chrome browser.
 
 This is a [serverless](https://github.com/serverless/serverless) project with a `make deploy` command that:
 
@@ -23,7 +23,7 @@ This is a [serverless](https://github.com/serverless/serverless) project with a 
 
 Read more:
 
-* https://headless-render-api.com (formerly named prerender.cloud from 2016 - 2022)
+* [Headless-Render-API.com](https://headless-render-api.com) (formerly named prerender.cloud from 2016 - 2022)
 * [Dec, 2016 Lambda@Edge intro](https://aws.amazon.com/blogs/aws/coming-soon-lambda-at-the-edge/)
 * [Lambda@Edge docs](http://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html)
 * [CloudFront docs for Lambda@Edge](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html)
