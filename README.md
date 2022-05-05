@@ -1,6 +1,6 @@
 **Note:** please test your app with a simple all-in-one solution here: https://github.com/sanfrancesco/prerendercloud-server before going through this Lambda@Edge+CloudFront setup process. Once that's debugged and working the way you want it, come back here to configure Lambda@Edge+CloudFront.
 
-# Prerender CloudFront (via AWS Lambda@Edge)
+# Pre-render CloudFront (via AWS Lambda@Edge)
 
 <img align="right" src="https://cloud.githubusercontent.com/assets/22159102/21554484/9d542f5a-cdc4-11e6-8c4c-7730a9e9e2d1.png">
 
