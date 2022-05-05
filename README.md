@@ -22,7 +22,7 @@ This is a [serverless](https://github.com/serverless/serverless) project with a 
 
 Read more:
 
-* https://www.prerender.cloud/
+* https://headless-render-api.com (formerly named prerender.cloud from 2016 - 2022)
 * [Dec, 2016 Lambda@Edge intro](https://aws.amazon.com/blogs/aws/coming-soon-lambda-at-the-edge/)
 * [Lambda@Edge docs](http://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html)
 * [CloudFront docs for Lambda@Edge](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html)
@@ -61,9 +61,11 @@ Node v14, and npm
 
 `$ npm install`
 
-#### 4. Hardcode your prerender.cloud auth token
+#### 4. Hardcode your headless-render-api.com auth token
 
-Edit [handler.js](handler.js) and set your prerender.cloud API token (cmd+f for `prerenderToken`)
+Edit [handler.js](handler.js) and set your headless-render-api.com API token (cmd+f for `prerenderToken`)
+
+note: Headless-Render-API.com was previously known as Prerender.cloud (rebranded 2022-05-01)
 
 #### 5. Edit any other configs (optional)
 
@@ -123,7 +125,7 @@ You can modify the content of the 404 page in [handler.js](handler.js)
 2. invalidate CloudFront
 3. you're done (no need to deploy the Lambda@Edge function after this initial setup)
 
-caveat: note that prerender.cloud has a 5-minute server cache that you can disable, see `disableServerCache` in [handler.js](/handler.js)
+caveat: note that headless-render-api.com has a 5-minute server cache that you can disable, see `disableServerCache` in [handler.js](/handler.js)
 
 #### 10. You're done!
 
@@ -142,9 +144,9 @@ To view logs from command line:
     * (change `AWS_REGION` to whatever region is closest to where you physically are since that's where the logs will be)
     * (FYI, for some reason, San Francisco based requests are ending up in us-west-2)
 
-#### Viewing Prerender.cloud logs
+#### Viewing Headless-Render-API.com logs
 
-Sign in to prerender.cloud and you'll see the last few requests made for your API key.
+Sign in to headless-render-api.com web app and you'll see the last few requests made for your API key.
 
 #### Cleanup
 
@@ -157,7 +159,7 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
 ## Caveats
 
 1. If you can't tolerate a slow first request (where subsequent requests are served from cache in CloudFront):
-    * crawl before invalidating the CloudFront distrubtion - just hit all of the URLs with [service.prerender.cloud](https://www.prerender.cloud/docs/api) and configure a `prerender-cache-duration` of something longer than the default of 5 minutes (300) - like 1 week (604800).
+    * crawl before invalidating the CloudFront distrubtion - just hit all of the URLs with [service.headless-render-api.com](https://headless-render-api.com/docs/api) and configure a `prerender-cache-duration` of something longer than the default of 5 minutes (300) - like 1 week (604800).
 2. This solution will serve index.html in place of something like `/some-special-file.html` even if `/some-special-file.html` exists on your origin
     * We're waiting for the Lambda@Edge to add a feature to address this
     * in the meantime use the `blacklistPaths` option (see [handler.js](https://github.com/sanfrancesco/prerendercloud-lambda-edge/blob/ccd87b5484a4334d823dbb8f0df16e843b2dc910/handler.js#L81))
@@ -174,5 +176,5 @@ Simply update [serverless.yaml](./serverless.yml) to the [latest or whatever you
 * Check your user-agent if using botsOnly
 * Sometimes (rarely) you'll see an error message on the webpage itself.
 * Check the AWS logs (see section "Viewing AWS Logs in CloudWatch")
-* Check Prerender.cloud logs (see section "Viewing Prerender.cloud logs")
+* Check headless-render-api.com logs (see section "Viewing headless-render-api.com logs")
 * Sometimes (rarely) there's an actual problem with AWS Lambda and you [may just need to re-deploy](https://www.reddit.com/r/aws/comments/7gumv7/question_aws_lambda_nodejs610_environment_issue/)
