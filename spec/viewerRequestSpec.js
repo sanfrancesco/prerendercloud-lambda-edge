@@ -17,7 +17,7 @@ describe("viewerRequest", function() {
 
   function runHandlerWithViewerRequestEvent() {
     beforeEach(function(done) {
-      this.cb = jasmine.createSpy("originalCallback").and.callFake(done);
+      this.cb = jasmine.createSpy("originalCallback").and.callFake(() => done());
       this.handler(this.event, this.context, this.cb);
     });
   }
