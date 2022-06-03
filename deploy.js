@@ -4,13 +4,22 @@ if (!process.env["CLOUDFRONT_DISTRIBUTION_ID"]) {
 
 CLOUDFRONT_DISTRIBUTION_ID = process.env["CLOUDFRONT_DISTRIBUTION_ID"];
 
+const viewjoin = 'Lambda-Edge-Prerendercloud-' + process.env["color"] + '-viewerRequest';
+const originjoin = 'Lambda-Edge-Prerendercloud-' + process.env["color"] + '-originRequest';
+const originName1 = process.env["stage"];
+const viewerName1 = process.env["stage"];
+const viewer = viewjoin //+ ':' + viewerName1;
+const origin = originjoin //+ ':' + originName1;
+console.log(viewer);
+console.log(origin);
+
 const lambdaMappings = [
   {
-    FunctionName: "Lambda-Edge-Prerendercloud-dev-viewerRequest",
+    FunctionName: viewer,
     EventType: "viewer-request"
   },
   {
-    FunctionName: "Lambda-Edge-Prerendercloud-dev-originRequest",
+    FunctionName: origin,
     EventType: "origin-request"
   },
   {
@@ -18,6 +27,7 @@ const lambdaMappings = [
     EventType: "origin-response"
   }
 ];
+console.log(lambdaMappings);
 
 const AWS = require("aws-sdk");
 AWS.config.region = "us-east-1";

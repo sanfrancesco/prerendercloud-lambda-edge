@@ -30,7 +30,7 @@ const resetPrerenderCloud = () => {
   // 1. prerenderToken (API token, you'll be rate limited without it)
   //    Get it after signing up at https://www.prerender.cloud/
   //    note: Lambda@Edge doesn't support env vars, so hardcoding is your only option.
-  // prerendercloud.set("prerenderToken", "mySecretToken")
+  prerendercloud.set("prerenderToken", "mySecretToken")
 
   // 2. protocol (optional, default is https)
   //    use this to force a certain protocol for requests from service.prerender.cloud to your origin
@@ -42,7 +42,7 @@ const resetPrerenderCloud = () => {
   //    or if you don't have one, then the CloudFront distribution URL (something like d1pxreml448ujs.cloudfront.net).
   //    Note, setting this config option shouldn't be necessary
   //    example value: example.com or d1pxreml448ujs.cloudfront.net (don't include the protocol)
-  // prerendercloud.set("host", "");
+  prerendercloud.set("host", "<${color}.test.com DNS Example CNAME>");
 
   // 4. removeTrailingSlash (recommended)
   //    Removes trailing slash from URLs to increase prerender.cloud server cache hit rate

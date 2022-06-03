@@ -15,12 +15,13 @@ provider:
   role: LambdaEdgeRole
 
 # you can overwrite defaults here
-#  stage: dev
+  stage: ${env:stage}
+  color: ${env:color}
 
-# you can define service wide environment variables here
+# you can not define service wide environment variables here as Lambda won't accept them
 #  environment:
-#    variable1: value1
-
+#    viewerName: dev    
+#    originName: dev
 # you can add packaging information here
 package:
 #  include:
@@ -38,7 +39,7 @@ package:
    - Makefile
 
 functions:
-  viewerRequest:
+  viewerRequest: 
     handler: handler.viewerRequest
     timeout: 5
   originRequest:
@@ -67,7 +68,7 @@ resources:
         Policies:
           - PolicyName: LambdaEdgeExecutionRole
             PolicyDocument:
-              Version: "2012-10-17"
+#              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
