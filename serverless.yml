@@ -1,4 +1,3 @@
-
 # see limits on Lambda@Edge http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html#limits-lambda-at-edge
 
 service: Lambda-Edge-Prerendercloud
@@ -9,33 +8,32 @@ service: Lambda-Edge-Prerendercloud
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs20.x
   region: us-east-1
   memorySize: 128
   role: LambdaEdgeRole
-
-# you can overwrite defaults here
-#  stage: dev
-
-# you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  # you can overwrite defaults here
+  # stage: dev
+  # you could define service wide environment variables here
+  # but lambda@edge doesn't support them and will throw error if you try
+  # environment:
+  #   variable1: value1
 
 # you can add packaging information here
 package:
-#  include:
-#    - include-me.js
-#    - include-me-dir/**
- excludeDevDependencies: true
- exclude:
-   - spec/**
-   - package-lock.json
-   - yarn.lock
-   - README.md
-   - deploy.js
-   - create-invalidation.js
-   - LICENSE
-   - Makefile
+  #  include:
+  #    - include-me.js
+  #    - include-me-dir/**
+  excludeDevDependencies: true
+  exclude:
+    - spec/**
+    - package-lock.json
+    - yarn.lock
+    - README.md
+    - deploy.js
+    - create-invalidation.js
+    - LICENSE
+    - Makefile
 
 functions:
   viewerRequest:
@@ -57,13 +55,13 @@ resources:
       Properties:
         AssumeRolePolicyDocument:
           Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - edgelambda.amazonaws.com
-                - lambda.amazonaws.com
-            Action:
-            - sts:AssumeRole
+            - Effect: Allow
+              Principal:
+                Service:
+                  - edgelambda.amazonaws.com
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
         Policies:
           - PolicyName: LambdaEdgeExecutionRole
             PolicyDocument:
