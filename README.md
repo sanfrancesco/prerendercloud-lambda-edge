@@ -6,7 +6,16 @@
 
 ![Github Actions CI](https://github.com/sanfrancesco/prerendercloud-lambda-edge/actions/workflows/node.js.yml/badge.svg)
 
-4-minute YouTube video walk-through (2022-04-25 update: AWS UI/UX has slightly changed since video but the video is still accurate): [https://youtu.be/SsMNQ3EaNZ0](https://youtu.be/SsMNQ3EaNZ0)
+4-minute YouTube video walk-through (2024-07-10 update: AWS UI/UX has slightly changed since video but the video is still accurate): [https://youtu.be/SsMNQ3EaNZ0](https://youtu.be/SsMNQ3EaNZ0)
+
+TL;DR:
+
+- step 1: put www files in s3 bucket
+- step 2: create cloudfront distribution pointing at s3 bucket
+- step 3: clone this repo, `npm install` and run: `CLOUDFRONT_DISTRIBUTION_ID=yourDistributionId make deploy` (set yourDistributionId to what was created in step 2)
+- step 4: wait ~5 minutes for aws systems to propagate (cloudfront url will show some error in the meantime)
+
+full guidance below or in video:
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=SsMNQ3EaNZ0
 " target="_blank"><img src="https://img.youtube.com/vi/SsMNQ3EaNZ0/sddefault.jpg"
@@ -58,7 +67,7 @@ Note, you **will not be creating** a CloudFront "custom error response" that red
 
 #### 3. Install Dependencies
 
-Node v14, and npm
+Node v20 (it works with node as low as v12 but aws lambda requires latest version of nodejs), and npm
 
 `$ npm install`
 
