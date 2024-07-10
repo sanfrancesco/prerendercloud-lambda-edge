@@ -136,7 +136,7 @@ const resetPrerenderCloud = () => {
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
 };
 
-const isNotBlocked = (req) => {
+const isNotBlocked = (blacklistSpaPaths, req) => {
   return !blacklistSpaPaths.some((pattern) => {
     if (pattern.endsWith("*")) {
       return req.url.startsWith(pattern.slice(0, -1));
