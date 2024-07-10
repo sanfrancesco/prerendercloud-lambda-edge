@@ -32,30 +32,29 @@ This is a [serverless](https://github.com/serverless/serverless) project with a 
 
 Read more:
 
-* [Headless-Render-API.com](https://headless-render-api.com) (formerly named prerender.cloud from 2016 - 2022)
-* [Dec, 2016 Lambda@Edge intro](https://aws.amazon.com/blogs/aws/coming-soon-lambda-at-the-edge/)
-* [Lambda@Edge docs](http://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html)
-* [CloudFront docs for Lambda@Edge](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html)
-
+- [Headless-Render-API.com](https://headless-render-api.com) (formerly named prerender.cloud from 2016 - 2022)
+- [Dec, 2016 Lambda@Edge intro](https://aws.amazon.com/blogs/aws/coming-soon-lambda-at-the-edge/)
+- [Lambda@Edge docs](http://docs.aws.amazon.com/lambda/latest/dg/lambda-edge.html)
+- [CloudFront docs for Lambda@Edge](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-at-the-edge.html)
 
 #### 1. Prerequisites
 
 1. S3 bucket with index.html and JavaScript files
-2. CloudFront distribution pointing to that S3 bucket (that also has * read access to that bucket)
+2. CloudFront distribution pointing to that S3 bucket (that also has \* read access to that bucket)
 
 Start with a new test bucket and CloudFront distribution before modifying your production account:
 
 (it'll be quick because you'll be using the defaults with just 1 exception)
 
-* S3 bucket in us-east-1 with default config (doesn't need to be public and doesn't need static web hosting)
-  * yes, us-east-1 makes things easier (using any other region will require a URL change for your CloudFront origin)
-* CloudFront distribution with S3 origin with default config except:
-  * (give CloudFront access to that bucket)
-    * "Restrict Bucket Access" = "Yes"
-    * "Origin Access Identity" = "Create a New Identity"
-    * "Grant Read Permissions on Bucket" = "Yes, Update Bucket Policy"
-    * (alternatively your S3 bucket [can be public - meaning an access policy that allows getObject on `*` for `*`](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-bucket-policies.html#example-bucket-policies-use-case-2))
-  * recommend enabling "automatic compression"
+- S3 bucket in us-east-1 with default config (doesn't need to be public and doesn't need static web hosting)
+  - yes, us-east-1 makes things easier (using any other region will require a URL change for your CloudFront origin)
+- CloudFront distribution with S3 origin with default config except:
+  - (give CloudFront access to that bucket)
+    - "Restrict Bucket Access" = "Yes"
+    - "Origin Access Identity" = "Create a New Identity"
+    - "Grant Read Permissions on Bucket" = "Yes, Update Bucket Policy"
+    - (alternatively your S3 bucket [can be public - meaning an access policy that allows getObject on `*` for `*`](http://docs.aws.amazon.com/AmazonS3/latest/dev/example-bucket-policies.html#example-bucket-policies-use-case-2))
+  - recommend enabling "automatic compression"
 
 That's all you need. Now just wait a few minutes for the CloudFront DNS to propogate.
 
@@ -124,7 +123,7 @@ You can modify the content of the 404 page in [handler.js](handler.js)
 
 #### 8. Lambda@Edge function Deployment (only needs to be done once, or whenever you `git pull` from this repo)
 
-1. Make sure there's a "default" section in your ~/.aws/credentials file with aws_access_key_id/aws_secret_access_key that have any of the following permissions: (full root, or see [serverless discussion](https://github.com/serverless/serverless/issues/1439) or you can use the following policies, which are _almost_ root: [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess])
+1. Make sure there's a "default" section in your ~/.aws/credentials file with aws*access_key_id/aws_secret_access_key that have any of the following permissions: (full root, or see [serverless discussion](https://github.com/serverless/serverless/issues/1439) or you can use the following policies, which are \_almost* root: [AWSLambdaFullAccess, AwsElasticBeanstalkFullAccess])
 2. now run: `$ CLOUDFRONT_DISTRIBUTION_ID=whateverYourDistributionIdIs make deploy`
 3. See the created Lambda function in Lambda: https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions
 4. See the created Lambda function in CloudFront: (refresh it, click your distribution, then the behaviors tab, then the checkbox + edit button for the first item in the list, then scroll to bottom of that page to see "Lambda Function Associations")
@@ -149,10 +148,10 @@ To view logs from command line:
 
 1. use an AWS account with `CloudWatchLogsReadOnlyAccess`
 2. `$ pip install awslogs` ( https://github.com/jorgebastida/awslogs )
-    * `AWS_REGION=us-west-2 awslogs get -s '1h' /aws/lambda/us-east-1.Lambda-Edge-Prerendercloud-dev-viewerRequest`
-    * `AWS_REGION=us-west-2 awslogs get -s '1h' /aws/lambda/us-east-1.Lambda-Edge-Prerendercloud-dev-originRequest`
-    * (change `AWS_REGION` to whatever region is closest to where you physically are since that's where the logs will be)
-    * (FYI, for some reason, San Francisco based requests are ending up in us-west-2)
+   - `AWS_REGION=us-west-2 awslogs get -s '1h' /aws/lambda/us-east-1.Lambda-Edge-Prerendercloud-dev-viewerRequest`
+   - `AWS_REGION=us-west-2 awslogs get -s '1h' /aws/lambda/us-east-1.Lambda-Edge-Prerendercloud-dev-originRequest`
+   - (change `AWS_REGION` to whatever region is closest to where you physically are since that's where the logs will be)
+   - (FYI, for some reason, San Francisco based requests are ending up in us-west-2)
 
 #### Viewing Headless-Render-API.com logs
 
@@ -169,12 +168,12 @@ You can also sign into AWS and go to CloudFormation and manually remove things.
 ## Caveats
 
 1. If you can't tolerate a slow first request (where subsequent requests are served from cache in CloudFront):
-    * crawl before invalidating the CloudFront distrubtion - just hit all of the URLs with [service.headless-render-api.com](https://headless-render-api.com/docs/api) and configure a `prerender-cache-duration` of something longer than the default of 5 minutes (300) - like 1 week (604800).
+   - crawl before invalidating the CloudFront distrubtion - just hit all of the URLs with [service.headless-render-api.com](https://headless-render-api.com/docs/api) and configure a `prerender-cache-duration` of something longer than the default of 5 minutes (300) - like 1 week (604800).
 2. This solution will serve index.html in place of something like `/some-special-file.html` even if `/some-special-file.html` exists on your origin
-    * We're waiting for the Lambda@Edge to add a feature to address this
-    * in the meantime use the `blacklistPaths` option (see [handler.js](https://github.com/sanfrancesco/prerendercloud-lambda-edge/blob/ccd87b5484a4334d823dbb8f0df16e843b2dc910/handler.js#L81))
+   - We're waiting for the Lambda@Edge to add a feature to address this
+   - in the meantime use the `blacklistPaths` option (see [handler.js](https://github.com/sanfrancesco/prerendercloud-lambda-edge/blob/ccd87b5484a4334d823dbb8f0df16e843b2dc910/handler.js#L81))
 3. Redirects (301/302 status codes)
-    * if you use `<meta name="prerender-status-code" content="301">` to initiate a redirect, your CloudFront TTL must be zero, otherwise CloudFront will cache the body/response and return status code 200 with the body from the redirected path
+   - if you use `<meta name="prerender-status-code" content="301">` to initiate a redirect, your CloudFront TTL must be zero, otherwise CloudFront will cache the body/response and return status code 200 with the body from the redirected path
 
 ## Updating Node.js runtime
 
@@ -182,9 +181,9 @@ Simply update [serverless.yaml](./serverless.yml) to the [latest or whatever you
 
 ## Troubleshooting
 
-* Read through the console output from the `make deploy` command and look for errors
-* Check your user-agent if using botsOnly
-* Sometimes (rarely) you'll see an error message on the webpage itself.
-* Check the AWS logs (see section "Viewing AWS Logs in CloudWatch")
-* Check headless-render-api.com logs (see section "Viewing headless-render-api.com logs")
-* Sometimes (rarely) there's an actual problem with AWS Lambda and you [may just need to re-deploy](https://www.reddit.com/r/aws/comments/7gumv7/question_aws_lambda_nodejs610_environment_issue/)
+- Read through the console output from the `make deploy` command and look for errors
+- Check your user-agent if using botsOnly
+- Sometimes (rarely) you'll see an error message on the webpage itself.
+- Check the AWS logs (see section "Viewing AWS Logs in CloudWatch")
+- Check headless-render-api.com logs (see section "Viewing headless-render-api.com logs")
+- Sometimes (rarely) there's an actual problem with AWS Lambda and you [may just need to re-deploy](https://www.reddit.com/r/aws/comments/7gumv7/question_aws_lambda_nodejs610_environment_issue/)
