@@ -10,7 +10,7 @@ const prerendercloud = require("prerendercloud");
 
 const origSet = prerendercloud.set;
 let cachedOptions = {};
-prerendercloud.set = function(optName, val) {
+prerendercloud.set = function (optName, val) {
   origSet.apply(undefined, arguments);
   cachedOptions[optName] = val;
 };
@@ -88,10 +88,11 @@ const resetPrerenderCloud = () => {
   //           things down unnecessarily)
   // prerendercloud.set('disableServerCache', true);
 
-  // 10. blacklistPaths
+  // 10. blacklistPaths (not for blacklisting paths in your SPA, but for static files that shouldn't be pre-rendered)
   //    the viewer-request function can't see what files exist on origin so you may need this
   //    if you have HTML files that should not be pre-rendered (e.g. google/apple/fb verification files)
   //    trailing * works as a wildcard
+  //    NOTE: this is for static files that you don't want pre-rendered, not SPA routes - for those, use shouldPrerenderAdditionalCheck
   // prerendercloud.set('blacklistPaths', req => ['/facebook-domain-verification.html', '/signin/*', '/google*']);
 
   // 11. removeScriptsTag (not recommended)
@@ -116,10 +117,32 @@ const resetPrerenderCloud = () => {
   //       - https://github.com/sanfrancesco/prerendercloud-ajaxmonkeypatch
   // prerendercloud.set("disableAjaxPreload", true);
 
-  // 13. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
+  // 13. shouldPrerenderAdditionalCheck
+  //     Runs in addition to the default user-agent check. Useful if you have your own conditions
+  //     e.g. blacklisting paths in your SPA, or only pre-rendering certain paths
+  //     just return true or false, your data is: req.headers and req.url
+  // const blacklistSpaPaths = [
+  //   "/some-page-that-prerenders-poorly",
+  //   "/auth/customer-profile/*",
+  //   "/interactive*",
+  // ];
+  // prerendercloud.set("shouldPrerenderAdditionalCheck", (req) =>
+  //   isNotBlocked(blacklistSpaPaths, req)
+  // );
+
+  // 14. see all configuration options here: https://github.com/sanfrancesco/prerendercloud-nodejs
 
   // for tests
   if (prerenderCloudOption) prerenderCloudOption(prerendercloud);
+};
+
+const isNotBlocked = (req) => {
+  return !blacklistSpaPaths.some((pattern) => {
+    if (pattern.endsWith("*")) {
+      return req.url.startsWith(pattern.slice(0, -1));
+    }
+    return req.url === pattern;
+  });
 };
 
 module.exports.viewerRequest = (event, context, callback) => {
@@ -172,12 +195,12 @@ module.exports.originRequest = (event, context, callback) => {
   if (shouldPrerender) {
     console.log("originRequest calling service.prerender.cloud:", {
       host: req.headers.host,
-      url: req.url
+      url: req.url,
     });
   } else {
     console.log("originRequest calling next", {
       host: req.headers.host,
-      url: req.url
+      url: req.url,
     });
   }
 
@@ -198,7 +221,7 @@ module.exports.originResponse = (event, context, callback) => {
       </html>
     `;
     cloudFrontResponse.headers["content-type"] = [
-      { key: "Content-Type", value: "text/html" }
+      { key: "Content-Type", value: "text/html" },
     ];
   }
 
@@ -207,7 +230,7 @@ module.exports.originResponse = (event, context, callback) => {
 
 // for tests
 var prerenderCloudOption;
-module.exports.setPrerenderCloudOption = cb => {
+module.exports.setPrerenderCloudOption = (cb) => {
   prerenderCloudOption = cb;
 };
 
